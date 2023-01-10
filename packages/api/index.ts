@@ -1,1 +1,1 @@
-export * from "./src/renameme/renameme"
+export * from "./src/greeter/greeter"
