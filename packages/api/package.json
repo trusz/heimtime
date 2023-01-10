@@ -1,0 +1,19 @@
+{
+  "name": "@someproject/api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "test": "vitest --root ./src --watch",
+    "build": "tsc --project .",
+    "build:watch": "tsc --project . --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^4.9.4",
+    "vitest": "^0.27.0"
+  }
+}
