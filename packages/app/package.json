@@ -28,6 +28,6 @@
 	"type": "module",
 	"dependencies": {
 		"@someproject/api": "workspace:^1.0.0",
-		"@someproject/uilib": "workspace:^0.0.1"
+		"@someproject/uilib": "../uilib/package"
 	}
 }

@@ -7,7 +7,7 @@
   "scripts": {
     "test": "vitest --root ./src --watch",
     "build": "tsc --project .",
-    "build:watch": "tsc --project . --watch"
+    "dev": "tsc --project . --watch"
   },
   "keywords": [],
   "author": "",
