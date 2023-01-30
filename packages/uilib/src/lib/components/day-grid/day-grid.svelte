@@ -1,9 +1,8 @@
 <script lang="ts">
 	import {minutes_to_date} from "$x/date"
 	import DayGridLayout from "./day-grid-layout.svelte"
-	import type { Item } from "./item"
 	import { event_to_item, slot_to_minutes, type Event } from "./event"
-	import Card from "./card.svelte"
+	import {Card} from "../card"
 	
 	// 
 	// Props
@@ -72,9 +71,9 @@
 
 
 <DayGridLayout 
-no_of_slots={no_of_slots}
-items={items}
-on:createstart={handleCreateStart}
-on:createprogress={handleCreateProgress}
-on:createstop={console.log}
+	no_of_slots={no_of_slots}
+	items={items}
+	on:createstart={handleCreateStart}
+	on:createprogress={handleCreateProgress}
+	on:createstop={console.log}
 />
