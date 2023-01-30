@@ -6,6 +6,7 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "test": "vitest --root ./src --watch",
+    "uilib": "npm run dev",
     "build": "tsc --project .",
     "dev": "tsc --project . --watch"
   },
