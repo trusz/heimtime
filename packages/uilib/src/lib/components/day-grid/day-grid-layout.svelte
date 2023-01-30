@@ -33,19 +33,26 @@
 		creating = false
 	}
 
+	function zeroPadding(n:number): string {
+		return String(n).padStart(2,"0")
+	}
+
 </script>
 
 <day-grid-layout style={`--no-of-slots:${no_of_slots}`}>
 	{#each slots as slot, si}
 		<div 
 			class="slot"
+			class:full={si%4===0}
 			style={`--row-end:${si+2}`}
+			data-hour={(si/4)+6}
+			data-minutes={zeroPadding((si%4)*15)}
 			on:focus
 			on:mousedown={() => handle_mouse_down(si)}
 			on:mouseup={() => handle_mouse_up(si)}
 			on:mouseover={() => handle_mouse_over(si)}
 		>
-			&nbsp; {si}
+			&nbsp;
 		</div>
 	{/each}
 
@@ -58,18 +65,25 @@
 
 <style>
 	day-grid-layout{
+
+		--left-margin: 2rem;
+
 		height:  100%;
-		width:   100%;
+		width:   calc(100% - var(--left-margin));
+		margin-left: var(--left-margin);
 		display: grid;
-		grid-template-rows: repeat( calc(var(--no-of-slots)-1), 10px);
-		
-		border: red thin solid;
+		/* gap: 1px; */
+		/* grid-template-rows: repeat( calc(var(--no-of-slots)-1), 25px); */
+		grid-auto-rows: 1rem;
+		/* border: red thin solid; */
 	}
 
 	.slot {
-		border-top: 	  thin solid var(--color-blue-3);
-		background-color: var(--color-blue-4);
+		/* border-top: thin solid var(--color-blue-1); */
+		/* background-color: var(--color-blue-4); */
 		user-select: 	  none;
+
+		transition: all 10ms;
 
 		grid-row-start:    calc( var(--row-end) - 1 );
 		grid-row-end: 	   var(--row-end);
@@ -77,19 +91,52 @@
 		grid-column-end:   2;
 	}
 	.slot:hover{
-		background-color: var(--color-blue-5);
+		background-color: var(--color-gray-6);
+	}
+	.slot::before{
+		content: " ";
+		
+	}
+
+	.slot.full {
+		border-top: thin solid var(--color-gray-5);
+	}
+
+
+	.slot::after,
+	.slot::before{
+		position: relative;
+		right: calc(var(--left-margin) + 0.5rem);
+		bottom: 0.5rem;
+		text-align: right;
+		width: 2ch;
+		display: inline-block;
+	}
+
+	/* .slot::after, */
+	.slot:not(.full)::after{
+		content: ":" attr(data-minutes);
+		right: calc(var(--left-margin) + 1rem - 2px);
+
+		width: 3ch;
+		opacity: 0;
+		color: var(--color-gray-4);
+
+		transition: all 50ms ease-in-out;
+	}
+
+	/* .slot:hover::after, */
+	.slot:not(.full):hover::after{
+		opacity: 1;
+	}
+
+	.slot.full::before{
+		content: attr(data-hour);
+		
 	}
 
 	.event {
-		background-color: var(--color-blue-1)cc;
-		position: relative;
-		margin: 0  10px;
 		display: block;
-		border-radius: var(--border-radius);
-		padding: 0 0.5rem;
-		backdrop-filter: blur(3px);
-		border: black thin solid;
-
 
 		grid-row-start:    var(--event-start);
 		grid-row-end: 	   var(--event-end);
