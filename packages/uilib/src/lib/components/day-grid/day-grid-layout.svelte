@@ -45,7 +45,7 @@
 			class="slot"
 			class:full={si%4===0}
 			style={`--row-end:${si+2}`}
-			data-hour={(si/4)+6}
+			data-hour={Math.floor((si/4)+6)}
 			data-minutes={zeroPadding((si%4)*15)}
 			on:focus
 			on:mousedown={() => handle_mouse_down(si)}
@@ -57,7 +57,11 @@
 	{/each}
 
 	{#each items as item }
-		<div class="event" style={`--event-start:${item.start+1}; --event-end:${item.end+1};`}>
+		<div 
+			class="event" 
+			class:dont-interact={creating}
+			style={`--event-start:${item.start+1}; --event-end:${item.end+1};`}
+		>
 			<svelte:component this={item.component} {...item.props} />
 		</div>
 	{/each}
@@ -113,7 +117,7 @@
 		display: inline-block;
 	}
 
-	/* .slot::after, */
+	.slot::after,
 	.slot:not(.full)::after{
 		content: ":" attr(data-minutes);
 		right: calc(var(--left-margin) + 1rem - 2px);
@@ -125,7 +129,9 @@
 		transition: all 50ms ease-in-out;
 	}
 
-	/* .slot:hover::after, */
+	.slot.full:hover::after,
+	/* .slot:not(.full):hover + .slot::after, */
+	.slot:hover + .slot::after,
 	.slot:not(.full):hover::after{
 		opacity: 1;
 	}
@@ -142,6 +148,9 @@
 		grid-row-end: 	   var(--event-end);
 		grid-column-start: 1;
 		grid-column-end:   2;
+	}
+
+	.event.dont-interact{
 		pointer-events: none;
 	}
 </style>
