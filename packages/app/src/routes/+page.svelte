@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Greeter  } from "@someproject/api"
-	import { Button } from "@someproject/uilib"
+	import { Greeter  } from "@heimtime/api"
+	import { Button } from "@heimtime/uilib"
 	const john = new Greeter()
 	john.sayHello()
 

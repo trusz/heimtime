@@ -27,9 +27,7 @@
 
 	<label>
 		<span>Description</span>
-		<textarea rows=5>
-
-		</textarea>
+		<textarea rows=5></textarea>
 	</label>
 
 	<button type="submit">save</button>

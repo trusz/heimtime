@@ -1,1 +1,1 @@
-export * from "./src/greeter/greeter"
+export * from "./src/event"
