@@ -9,26 +9,43 @@ Layout:
 └────────────────────────────────────────┘
 */
 
+	import { Popup } from "../popup"
+	import { EventForm } from "../event_form"
+
 	export let date_start: Date
 	export let date_end: Date
 	export let project: string
 	export let task: string
 	export let description: string
 
+	let anchor: HTMLElement
+	let is_popup_open = false
+
 	const format_time = Intl.DateTimeFormat("de-DE", {timeStyle:"short"}).format
 	function format_time_span(start: Date, end: Date): string {
 		return `${format_time(start)} - ${format_time(end)}`
 	}
 
+	function handle_click(){
+		console.log({level:"dev", msg:"clicked"})
+		is_popup_open = true
+	}
+
+
+
 
 </script>
 
-<card>
+<card on:dblclick={handle_click} on:keypress bind:this={anchor} >
 	<div class="time-span">{format_time_span(date_start, date_end)}</div>
 	<div class="project">{project}</div>
 	<div class="task">{task}</div>
 	<div class="description">{description}</div>
 </card>
+
+<Popup bind:is_open={is_popup_open} anchor_el={anchor}>
+	<EventForm />
+</Popup>
 
 
 <style>
