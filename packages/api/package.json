@@ -1,5 +1,5 @@
 {
-  "name": "@someproject/api",
+  "name": "@heimtime/api",
   "version": "1.0.0",
   "description": "",
   "main": "lib/index.js",
@@ -16,5 +16,10 @@
   "devDependencies": {
     "typescript": "^4.9.4",
     "vitest": "^0.27.0"
+  },
+  "dependencies": {
+    "@xstate/svelte": "^2.0.1",
+    "svelte": "^3.54.0",
+    "xstate": "^4.35.4"
   }
 }

@@ -72,9 +72,11 @@
 		z-index:  1000;
 		transform: translate3d(var(--pos-x,0), var(--pos-y,0), 0px);
 
-		background: var(--color-glass);
+		background: var(--color-dark-glass);
+		border: thin solid black;
 		backdrop-filter: blur(3px);
-		box-shadow: 0 0 7px 1px black;
+		border-radius: var(--border-radius);
+		/* box-shadow: 0 0 7px 1px black; */
 
 		display: none;
 	}

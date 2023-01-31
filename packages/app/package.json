@@ -28,7 +28,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@someproject/api": "workspace:^1.0.0",
-		"@someproject/uilib": "../uilib/package"
+		"@heimtime/api": "workspace:^1.0.0",
+		"@heimtime/uilib": "../uilib/package"
 	}
 }

@@ -65,6 +65,17 @@ a:active {
 	--color-gray-5: #565254ff;
 	--color-gray-6: #56525499;
 	
-	--color-glass: #00000022
+	--color-dark-glass: #00000099
+
+	--color-black-1: #000000;
+	--color-black-2: #080808;
+	--color-black-3: #0f0f0f;
+	--color-black-4: #171717;
+	--color-black-5: #1f1f1f;
+	--color-black-6: #262626;
+	--color-black-7: #2e2e2e;
+	--color-black-8: #363636;
+	--color-black-9: #3d3d3d;
+	--color-black-10: #454545;
 
 }

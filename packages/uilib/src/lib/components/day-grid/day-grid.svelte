@@ -1,11 +1,12 @@
 <script lang="ts">
-	import {minutes_to_date} from "$x/date"
+	import { minutes_to_date } from "$x/date"
 	import DayGridLayout from "./day-grid-layout.svelte"
-	import { event_to_item, slot_to_minutes, type Event } from "./event"
-	import {Card} from "../card"
+	import { slot_to_minutes, type Event } from "@heimtime/api"
+	import { event_to_item } from "./item"
+	import { Card } from "../card"
 	
 	// 
-	// Props
+	// Input Props
 	// 
 	export let start_hour_24   = 6
 	export let end_hour_24     = 22
@@ -26,7 +27,7 @@
 	// 
 	let events: Event[] = []
 	
-	function handleCreateStart(event:CustomEvent<number>){
+	function handle_create_start(event:CustomEvent<number>){
 		const index = event.detail
 		
 		const start_minutes = slot_to_minutes(index, start_hour_24, step_in_minutes)
@@ -43,10 +44,9 @@
 			title:     "TODO"
 		}
 		
-		
 		events = [...events, new_event]
 	}
-	function handleCreateProgress(e: CustomEvent<number>){
+	function handle_create_progress(e: CustomEvent<number>){
 		let index = e.detail
 		const event = events[events.length - 1]
 		const new_event = {...event}
@@ -73,7 +73,7 @@
 <DayGridLayout 
 	no_of_slots={no_of_slots}
 	items={items}
-	on:createstart={handleCreateStart}
-	on:createprogress={handleCreateProgress}
+	on:createstart={handle_create_start}
+	on:createprogress={handle_create_progress}
 	on:createstop={console.log}
 />
