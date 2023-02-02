@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Example } from "$lib/components/internal/example"
+  import { Event_State } from "@heimtime/api";
 	import Card from "./card.svelte"
 
 	let container_width = 400;
@@ -10,6 +11,7 @@
 	let project = "Heimtime"
 	let task = "development"
 	let description = "building card component"
+	let state: Event_State = Event_State.Stable
 
 </script>
 
@@ -19,6 +21,15 @@
 
 	<div><label for="container_width">Container height</label></div>
 	<div><input id="container_width"  type="range" min=30 max=400 bind:value={container_height} /></div>
+
+	<div>
+		<select bind:value={state}>
+			<option value={Event_State.Stable}>		 Stable </option>
+			<option value={Event_State.In_Progress}> In Progress </option>
+			<option value={Event_State.Saving}> 	 Saving </option>
+			<option value={Event_State.Error}> 		 Error </option>
+		</select>
+	</div>
 	
 	<div class="container" style={`width:${container_width}px; height:${container_height}px`}>
 		<Card 
@@ -27,6 +38,7 @@
 			project={project}
 			task={task}
 			description={description}
+			state={state}
 		/>
 	</div>
 </Example>

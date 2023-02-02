@@ -4,6 +4,10 @@ export type Event = {
 	state: Event_State;
 }
 
+export function event_overlap(a: Event, b: Event): boolean{
+	return Math.max(a.start.getTime(), b.start.getTime()) < Math.min(a.end.getTime(), b.end.getTime())
+}
+
 const HOUR_IN_MINUTES = 60
 
 // 
@@ -66,8 +70,8 @@ type State_Machine = {
 const state_machine: State_Machine = {
 	[Event_State.In_Progress]: {
 		[Event_Action.Creation_Progression]: Event_State.In_Progress,
-		[Event_Action.Form_Changes]: 		Event_State.In_Progress,
-		[Event_Action.Form_Finished]: 		Event_State.Saving,
+		[Event_Action.Form_Changes]: 		 Event_State.In_Progress,
+		[Event_Action.Form_Finished]: 		 Event_State.Saving,
 	},
 	[Event_State.Saving]: {
 		[Event_Action.Save_Success]: Event_State.Stable,

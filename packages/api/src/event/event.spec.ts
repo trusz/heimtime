@@ -4,8 +4,9 @@ import {
 	date_to_slot, 
 	slot_to_minutes, 
 	event_execute_action, 
+	event_overlap,
 	Event_Action, 
-	Event_State, 
+	Event_State,
 } from "./event"
 
 suite("event", () => {
@@ -177,6 +178,195 @@ suite("event", () => {
 		}
 
 
+	})
+
+	// overview image: https://i.stack.imgur.com/0c6q0.png
+	// stackoverflow: https://stackoverflow.com/questions/325933/determine-whether-two-date-ranges-overlap
+	suite("overlapping", () => {
+		type Test_Case = {
+			desc: 				  string,
+			event_a: 			  Event,
+			event_b: 			  Event,
+			expected_overlapping: boolean
+		}
+
+		const test_cases: Test_Case[] = [
+			{
+				desc: "after",
+				event_a: {
+					start: new Date("2000-01-01 10:00"),
+					end: new Date("2000-01-01 11:00"),
+					state: Event_State.In_Progress,
+				},
+				event_b: {
+					start: new Date("2000-01-01 11:15"),
+					end: new Date("2000-01-01 11:30"),
+					state: Event_State.In_Progress,
+				},
+				expected_overlapping: false
+			},
+			{
+				desc: "start touching",
+				event_a: {
+					start: new Date("2000-01-01 10:00"),
+					end: new Date("2000-01-01 11:00"),
+					state: Event_State.In_Progress,
+				},
+				event_b: {
+					start: new Date("2000-01-01 11:00"),
+					end: new Date("2000-01-01 11:30"),
+					state: Event_State.In_Progress,
+				},
+				expected_overlapping: false
+			},
+			{
+				desc: "start inside",
+				event_a: {
+					start: new Date("2000-01-01 10:00"),
+					end: new Date("2000-01-01 11:00"),
+					state: Event_State.In_Progress,
+				},
+				event_b: {
+					start: new Date("2000-01-01 10:45"),
+					end: new Date("2000-01-01 11:30"),
+					state: Event_State.In_Progress,
+				},
+				expected_overlapping: true
+			},
+			{
+				desc: "inside start touching",
+				event_a: {
+					start: new Date("2000-01-01 10:00"),
+					end: new Date("2000-01-01 11:00"),
+					state: Event_State.In_Progress,
+				},
+				event_b: {
+					start: new Date("2000-01-01 10:00"),
+					end: new Date("2000-01-01 11:30"),
+					state: Event_State.In_Progress,
+				},
+				expected_overlapping: true
+			},
+			{
+				desc: "enclosing start touching",
+				event_a: {
+					start: new Date("2000-01-01 10:00"),
+					end: new Date("2000-01-01 11:00"),
+					state: Event_State.In_Progress,
+				},
+				event_b: {
+					start: new Date("2000-01-01 10:00"),
+					end: new Date("2000-01-01 10:30"),
+					state: Event_State.In_Progress,
+				},
+				expected_overlapping: true
+			},
+			{
+				desc: "enclosing",
+				event_a: {
+					start: new Date("2000-01-01 10:00"),
+					end: new Date("2000-01-01 11:00"),
+					state: Event_State.In_Progress,
+				},
+				event_b: {
+					start: new Date("2000-01-01 10:15"),
+					end: new Date("2000-01-01 10:30"),
+					state: Event_State.In_Progress,
+				},
+				expected_overlapping: true
+			},
+			{
+				desc: "enclosing end touching",
+				event_a: {
+					start: new Date("2000-01-01 10:00"),
+					end: new Date("2000-01-01 11:00"),
+					state: Event_State.In_Progress,
+				},
+				event_b: {
+					start: new Date("2000-01-01 10:15"),
+					end: new Date("2000-01-01 11:00"),
+					state: Event_State.In_Progress,
+				},
+				expected_overlapping: true
+			},
+			{
+				desc: "inside",
+				event_a: {
+					start: new Date("2000-01-01 10:00"),
+					end: new Date("2000-01-01 11:00"),
+					state: Event_State.In_Progress,
+				},
+				event_b: {
+					start: new Date("2000-01-01 09:30"),
+					end: new Date("2000-01-01 11:30"),
+					state: Event_State.In_Progress,
+				},
+				expected_overlapping: true
+			},
+			{
+				desc: "inside end touching",
+				event_a: {
+					start: new Date("2000-01-01 10:00"),
+					end: new Date("2000-01-01 11:00"),
+					state: Event_State.In_Progress,
+				},
+				event_b: {
+					start: new Date("2000-01-01 09:30"),
+					end: new Date("2000-01-01 11:00"),
+					state: Event_State.In_Progress,
+				},
+				expected_overlapping: true
+			},
+			{
+				desc: "end inside",
+				event_a: {
+					start: new Date("2000-01-01 10:00"),
+					end: new Date("2000-01-01 11:00"),
+					state: Event_State.In_Progress,
+				},
+				event_b: {
+					start: new Date("2000-01-01 10:30"),
+					end: new Date("2000-01-01 11:30"),
+					state: Event_State.In_Progress,
+				},
+				expected_overlapping: true
+			},
+			{
+				desc: "end touching",
+				event_a: {
+					start: new Date("2000-01-01 10:00"),
+					end: new Date("2000-01-01 11:00"),
+					state: Event_State.In_Progress,
+				},
+				event_b: {
+					start: new Date("2000-01-01 11:00"),
+					end: new Date("2000-01-01 11:30"),
+					state: Event_State.In_Progress,
+				},
+				expected_overlapping: false
+			},
+			{
+				desc: "before",
+				event_a: {
+					start: new Date("2000-01-01 10:00"),
+					end: new Date("2000-01-01 11:00"),
+					state: Event_State.In_Progress,
+				},
+				event_b: {
+					start: new Date("2000-01-01 11:15"),
+					end: new Date("2000-01-01 11:30"),
+					state: Event_State.In_Progress,
+				},
+				expected_overlapping: false
+			},
+		]
+
+		for(const tc of test_cases){
+			test(tc.desc, () => {
+				const overlap = event_overlap(tc.event_a, tc.event_b)
+				expect(overlap).toEqual(tc.expected_overlapping)
+			})
+		}
 	})
 
 })

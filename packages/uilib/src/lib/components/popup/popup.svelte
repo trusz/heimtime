@@ -13,7 +13,6 @@
 		if(!anchor_el){ return }
 		// const is_inside = anchor_el.contains(target)
 		const is_inside = popup.contains(target)
-		console.log({level:"dev", msg:"body click", is_open, target, is_inside})
 				
 
 		if(!is_open){ return }
