@@ -2,8 +2,11 @@
 	import { Example } from "$lib/components/internal/example"
 	import DayGridLayout from "./day-grid-layout.svelte";
 	import DayGrid from "./day-grid.svelte"
+	import { init_event_context } from "@heimtime/api"
 
 	let noOfSlots = 20
+
+	init_event_context()
 
 </script>
 

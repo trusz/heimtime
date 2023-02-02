@@ -17,7 +17,7 @@ export function event_to_item(
 	comp: 			 SvelteComp,
 ): Item {
 
-	const format_date = Intl.DateTimeFormat("de-DE", {timeStyle:"short"}).format
+
 	let start_date = e.start
 	let end_date = e.end
 	
@@ -30,7 +30,12 @@ export function event_to_item(
 		end:   date_to_slot(end_date, start_hour, step_in_minutes),
 		component: comp,
 		props: {
-			title: `${format_date(start_date)} - ${format_date(end_date)}`
+			date_start: start_date,
+			date_end: end_date,
+			project: "todo",
+			task: "todo",
+			description: "todo",
+			state: e.state,
 		},
 	}
 
