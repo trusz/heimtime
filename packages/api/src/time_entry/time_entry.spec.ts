@@ -1,17 +1,19 @@
 import { suite, test, expect } from "vitest"
+import { new_project, new_task } from "../project"
 import { 
-	type Event,
+	type Time_Entry,
 	date_to_slot, 
 	slot_to_minutes, 
-	event_execute_action, 
-	event_overlap,
-	Event_Action, 
-	Event_State,
-} from "./event"
+	time_entry_execute_action, 
+	time_entry_overlap,
+	Time_Entry_Action, 
+	Time_Entry_State,
+	new_time_entry,
+} from "./time_entry"
 
-suite("event", () => {
+suite("time_entry", () => {
 	suite("date_to_slot", () => {
-		type TestCase = {
+		type Test_Case = {
 			desc: 		 		  string
 			date: 		 		  Date
 			start_hour:  		  number
@@ -19,7 +21,7 @@ suite("event", () => {
 			expected_slot_number: number
 		}
 		
-		const featureTests: TestCase[] = [
+		const featureTests: Test_Case[] = [
 			{
 				desc: "first slot",
 				date: new Date("2000-01-01 06:00"),
@@ -50,9 +52,9 @@ suite("event", () => {
 			},
 		]
 		
-		featureTests.forEach(testFeature)
+		featureTests.forEach(test_feature)
 		
-		function testFeature(tc: TestCase) {
+		function test_feature(tc: Test_Case) {
 			test(tc.desc, () => {
 				const actual_slot_number = date_to_slot(
 					tc.date,
@@ -143,36 +145,37 @@ suite("event", () => {
 	suite("state_machine", () => {
 		type Test_Case = {
 			desc: 		    string
-			start_state:    Event_State,
-			action: 		Event_Action,
-			expected_state: Event_State
+			start_state:    Time_Entry_State,
+			action: 		Time_Entry_Action,
+			expected_state: Time_Entry_State
 		}
 
 		const test_cases: Test_Case[] = [
 			{
 				desc:			"Sate can stay the same",
-				start_state: 	Event_State.In_Progress,
-				action: 		Event_Action.Creation_Progression,
-				expected_state: Event_State.In_Progress,
+				start_state: 	Time_Entry_State.In_Progress,
+				action: 		Time_Entry_Action.Creation_Progression,
+				expected_state: Time_Entry_State.In_Progress,
 			},
 			{
 				desc:			"Sate can change",
-				start_state: 	Event_State.In_Progress,
-				action: 		Event_Action.Form_Finished,
-				expected_state: Event_State.Saving,
+				start_state: 	Time_Entry_State.In_Progress,
+				action: 		Time_Entry_Action.Form_Finished,
+				expected_state: Time_Entry_State.Saving,
 			},
 		]
 
 		for(const tc of test_cases){
 			test(tc.desc, () => {
-				const event: Event = {
-					start: new Date(),
-					end: new Date(),
-					state: tc.start_state,
-				}
+				const time_entry: Time_Entry = new_time_entry(
+					undefined,
+					undefined,
+					undefined,
+					tc.start_state,
+				)
 
-				const modified_event = event_execute_action(event, tc.action)
-				expect(modified_event).toHaveProperty("state", tc.expected_state)
+				const modified_time_entry = time_entry_execute_action(time_entry, tc.action)
+				expect(modified_time_entry).toHaveProperty("state", tc.expected_state)
 
 			})
 		}
@@ -185,177 +188,177 @@ suite("event", () => {
 	suite("overlapping", () => {
 		type Test_Case = {
 			desc: 				  string,
-			event_a: 			  Event,
-			event_b: 			  Event,
+			time_entry_a: 		  Partial<Time_Entry>,
+			time_entry_b: 	      Partial<Time_Entry>,
 			expected_overlapping: boolean
 		}
 
 		const test_cases: Test_Case[] = [
 			{
 				desc: "after",
-				event_a: {
+				time_entry_a: {
 					start: new Date("2000-01-01 10:00"),
 					end: new Date("2000-01-01 11:00"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
-				event_b: {
+				time_entry_b: {
 					start: new Date("2000-01-01 11:15"),
 					end: new Date("2000-01-01 11:30"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
 				expected_overlapping: false
 			},
 			{
 				desc: "start touching",
-				event_a: {
+				time_entry_a: {
 					start: new Date("2000-01-01 10:00"),
 					end: new Date("2000-01-01 11:00"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
-				event_b: {
+				time_entry_b: {
 					start: new Date("2000-01-01 11:00"),
 					end: new Date("2000-01-01 11:30"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
 				expected_overlapping: false
 			},
 			{
 				desc: "start inside",
-				event_a: {
+				time_entry_a: {
 					start: new Date("2000-01-01 10:00"),
 					end: new Date("2000-01-01 11:00"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
-				event_b: {
+				time_entry_b: {
 					start: new Date("2000-01-01 10:45"),
 					end: new Date("2000-01-01 11:30"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
 				expected_overlapping: true
 			},
 			{
 				desc: "inside start touching",
-				event_a: {
+				time_entry_a: {
 					start: new Date("2000-01-01 10:00"),
 					end: new Date("2000-01-01 11:00"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
-				event_b: {
+				time_entry_b: {
 					start: new Date("2000-01-01 10:00"),
 					end: new Date("2000-01-01 11:30"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
 				expected_overlapping: true
 			},
 			{
 				desc: "enclosing start touching",
-				event_a: {
+				time_entry_a: {
 					start: new Date("2000-01-01 10:00"),
 					end: new Date("2000-01-01 11:00"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
-				event_b: {
+				time_entry_b: {
 					start: new Date("2000-01-01 10:00"),
 					end: new Date("2000-01-01 10:30"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
 				expected_overlapping: true
 			},
 			{
 				desc: "enclosing",
-				event_a: {
+				time_entry_a: {
 					start: new Date("2000-01-01 10:00"),
 					end: new Date("2000-01-01 11:00"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
-				event_b: {
+				time_entry_b: {
 					start: new Date("2000-01-01 10:15"),
 					end: new Date("2000-01-01 10:30"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
 				expected_overlapping: true
 			},
 			{
 				desc: "enclosing end touching",
-				event_a: {
+				time_entry_a: {
 					start: new Date("2000-01-01 10:00"),
 					end: new Date("2000-01-01 11:00"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
-				event_b: {
+				time_entry_b: {
 					start: new Date("2000-01-01 10:15"),
 					end: new Date("2000-01-01 11:00"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
 				expected_overlapping: true
 			},
 			{
 				desc: "inside",
-				event_a: {
+				time_entry_a: {
 					start: new Date("2000-01-01 10:00"),
 					end: new Date("2000-01-01 11:00"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
-				event_b: {
+				time_entry_b: {
 					start: new Date("2000-01-01 09:30"),
 					end: new Date("2000-01-01 11:30"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
 				expected_overlapping: true
 			},
 			{
 				desc: "inside end touching",
-				event_a: {
+				time_entry_a: {
 					start: new Date("2000-01-01 10:00"),
 					end: new Date("2000-01-01 11:00"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
-				event_b: {
+				time_entry_b: {
 					start: new Date("2000-01-01 09:30"),
 					end: new Date("2000-01-01 11:00"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
 				expected_overlapping: true
 			},
 			{
 				desc: "end inside",
-				event_a: {
+				time_entry_a: {
 					start: new Date("2000-01-01 10:00"),
 					end: new Date("2000-01-01 11:00"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
-				event_b: {
+				time_entry_b: {
 					start: new Date("2000-01-01 10:30"),
 					end: new Date("2000-01-01 11:30"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
 				expected_overlapping: true
 			},
 			{
 				desc: "end touching",
-				event_a: {
+				time_entry_a: {
 					start: new Date("2000-01-01 10:00"),
 					end: new Date("2000-01-01 11:00"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
-				event_b: {
+				time_entry_b: {
 					start: new Date("2000-01-01 11:00"),
 					end: new Date("2000-01-01 11:30"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
 				expected_overlapping: false
 			},
 			{
 				desc: "before",
-				event_a: {
+				time_entry_a: {
 					start: new Date("2000-01-01 10:00"),
 					end: new Date("2000-01-01 11:00"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
-				event_b: {
+				time_entry_b: {
 					start: new Date("2000-01-01 11:15"),
 					end: new Date("2000-01-01 11:30"),
-					state: Event_State.In_Progress,
+					state: Time_Entry_State.In_Progress,
 				},
 				expected_overlapping: false
 			},
@@ -363,7 +366,19 @@ suite("event", () => {
 
 		for(const tc of test_cases){
 			test(tc.desc, () => {
-				const overlap = event_overlap(tc.event_a, tc.event_b)
+				const time_entry_a = new_time_entry(
+					undefined,
+					tc.time_entry_a.start,
+					tc.time_entry_a.end,
+					tc.time_entry_a.state,
+				)
+				const time_entry_b = new_time_entry(
+					undefined,
+					tc.time_entry_b.start,
+					tc.time_entry_b.end,
+					tc.time_entry_b.state,
+				)
+				const overlap = time_entry_overlap(time_entry_a, time_entry_b)
 				expect(overlap).toEqual(tc.expected_overlapping)
 			})
 		}
