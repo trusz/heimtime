@@ -62,7 +62,7 @@
 			class:dont-interact={creating}
 			style={`--event-start:${item.start+1}; --event-end:${item.end+1};`}
 		>
-			<svelte:component this={item.component} {...item.props} on:save={item.props.onsave} />
+			<svelte:component this={item.component} {...item.props} on:save={item.props.onsave} on:delete={item.props.ondelete} />
 		</div>
 	{/each}
 </day-grid-layout>

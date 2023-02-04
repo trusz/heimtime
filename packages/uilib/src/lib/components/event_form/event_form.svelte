@@ -3,14 +3,29 @@
   	import { use_project_context, type Project, type Task } from "@heimtime/api";
 	import { createEventDispatcher } from "svelte"
 
+	// 
+	// Input Props
+	// 
 	export let selected_task: Task | undefined
 
+	// 
+	// Context
+	// 
 	const {store_projects} = use_project_context()
+
+	// 
+	// Setup
+	// 
+	const dispatch = createEventDispatcher()
 	let projects: Project[]
 	$: projects = $store_projects
 
-	const dispatch = createEventDispatcher()
+	let new_selected_task: Task | undefined = selected_task
+	let new_description = ""
 
+	// 
+	// Actions
+	// 
 	function handle_submit(e:unknown){
 		const detail: Event_Save = {
 			task: new_selected_task,
@@ -18,11 +33,11 @@
 		}
 		dispatch("save", detail)
 	}
+
+	function handle_delete(){
+		dispatch("delete")
+	}
 	
-	let new_selected_task: Task | undefined = selected_task
-
-	let new_description = ""
-
 </script>
 
 <event-form>
@@ -46,6 +61,7 @@
 	</label>
 
 	<button type="submit">save</button>
+	<button on:click|preventDefault={handle_delete}>delete</button>
 </form>
 </event-form>
 

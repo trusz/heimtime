@@ -14,6 +14,7 @@
 	import type { Event_Save } from "$lib/components/event_form/events";
 	import { Popup } from "../popup"
 	import { EventForm } from "../event_form"
+  import type { Event_Detail_Delete } from "$lib/components/card/card_events";
 
 	// 
 	// Input Props
@@ -39,6 +40,12 @@
 	const dispatch = createEventDispatcher()
 	function handle_save(e: CustomEvent<Event_Save>){
 		dispatch("save", e.detail)
+		is_popup_open = false
+	}
+
+	function handle_delete(){
+		const detail: Event_Detail_Delete = {id: time_entry.id}
+		dispatch("delete", detail)
 		is_popup_open = false
 	}
 
@@ -68,6 +75,7 @@
 	<EventForm 
 		selected_task={time_entry.task}
 		on:save={handle_save}
+		on:delete={handle_delete}
 	/>
 </Popup>
 

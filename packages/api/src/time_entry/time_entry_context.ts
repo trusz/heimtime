@@ -21,6 +21,7 @@ const time_entry_context = {
 	update_last_time_entry,
 	update_time_entry,
 	update_time_entry_by_id,
+	delete_time_entry,
 }
 type Time_Entry_Context = typeof time_entry_context
 const context_key = {}
@@ -79,11 +80,23 @@ function update_time_entry_by_id(id: number, time_entry: Time_Entry){
 	const time_entries = get(store_time_entry)
 	const index = time_entries.findIndex(te => te.id === id)
 	if(index < 0){
-		console.log({level:"warn", msg:"could not find time entry by id, stopping", id })
+		console.log({level:"warn", msg:"update_time_entry_by_id: could not find time entry by id, stopping", id })
 		return
 	}
 
 	update_time_entry(index, time_entry)
+}
+
+function delete_time_entry(id: number){
+	const time_entries = [...get(store_time_entry)]
+	const index = time_entries.findIndex(te => te.id === id)
+	if(index < 0){
+		console.log({level:"warn", msg:"delete_time_entry: could not find time entry by id, stopping", id })
+		return
+	}
+	time_entries.splice(index,1)
+	store_time_entry.set(time_entries)
+	
 }
 
 function find_overlapping_time_entries(e:Time_Entry, time_entires: Time_Entry[]): Time_Entry[]{

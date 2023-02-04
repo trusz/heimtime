@@ -1,10 +1,11 @@
 <script lang="ts">time_entry_to_item
 	import DayGridLayout from "./day-grid-layout.svelte"
-	import { slot_to_minutes, type Time_Entry, time_entry_context_use, use_project_context, type Project, init_project_context, Time_Entry_State } from "@heimtime/api"
+	import { slot_to_minutes, type Time_Entry, time_entry_context_use, use_project_context, type Project, init_project_context, Time_Entry_State, time_entry_execute_action, Time_Entry_Action } from "@heimtime/api"
 	import { time_entry_to_item } from "./item"
 	import { Card } from "../card"
   	import { minutes_to_date } from "../../x/date"
   	import type { Event_Save } from "$lib/components/event_form/events";
+  import type { Event_Detail_Delete } from "$lib/components/card/card_events";
 	
 	// 
 	// Input Props
@@ -33,7 +34,8 @@
 			start_hour_24, 
 			step_in_minutes, 
 			Card,
-			(event:CustomEvent<Event_Save>) => handle_save(tei, event)
+			(event:CustomEvent<Event_Save>) => handle_save(tei, event),
+			handle_delete,
 		)
 	)
 
@@ -44,12 +46,23 @@
 
 		const project = $store_projects.find(p => p.tasks.indexOf(task) >= 0)
 		
-		const new_entry = {...$store_time_entry[index]}
-		new_entry.task = task
-		new_entry.project = project
-		new_entry.description = event.detail.description
-		new_entry.state = Time_Entry_State.Saving
-		update_time_entry(index,new_entry)
+		const time_entry = $store_time_entry[index]
+		const modified_entry = time_entry_execute_action(time_entry, Time_Entry_Action.Form_Finished)
+		modified_entry.task = task
+		modified_entry.project = project
+		modified_entry.description = event.detail.description
+		update_time_entry(index,modified_entry)
+	}
+	function handle_delete(event: CustomEvent<Event_Detail_Delete>){
+		const id = event.detail.id
+		const time_entry_to_delete = $store_time_entry.find(te => te.id === id)
+		if(!time_entry_to_delete){
+			console.log({level:"warn", msg:"could not find time entry to delete, stopping", id})
+			return
+		}
+		const modified_te = time_entry_execute_action(time_entry_to_delete, Time_Entry_Action.Delete)
+		update_time_entry_by_id(id, modified_te)
+
 	}
 
 	
@@ -62,6 +75,7 @@
 		last_time_entry, 
 		update_last_time_entry,
 		update_time_entry,
+		update_time_entry_by_id,
 		store_time_entry,
 	 } = time_entry_context_use()
 	
