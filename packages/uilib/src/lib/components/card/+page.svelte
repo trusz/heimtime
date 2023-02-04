@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Example } from "$lib/components/internal/example"
-  import { Event_State, use_project_context, init_project_context, new_project, new_task} from "@heimtime/api";
+  import { Time_Entry_State, use_project_context, init_project_context, new_project, new_task, new_time_entry} from "@heimtime/api";
 	import Card from "./card.svelte"
 
 	// 
@@ -38,10 +38,18 @@
 
 	let date_start = new Date("2000-01-01 13:30")
 	let date_end = new Date("2000-01-01 14:15")
+	$: time_entry = new_time_entry(
+		undefined,
+		date_start,
+		date_end,
+		state,
+		$store_projects[0],
+		$store_projects[0].tasks[0],
+	)
 	$: project = $store_projects[0]
 	$: task = project.tasks[0]
 	let description = "building card component"
-	let state: Event_State = Event_State.Stable
+	let state: Time_Entry_State = Time_Entry_State.Stable
 
 </script>
 
@@ -54,10 +62,11 @@
 
 	<div>
 		<select bind:value={state}>
-			<option value={Event_State.Stable}>		 Stable </option>
-			<option value={Event_State.In_Progress}> In Progress </option>
-			<option value={Event_State.Saving}> 	 Saving </option>
-			<option value={Event_State.Error}> 		 Error </option>
+			<option value={Time_Entry_State.Stable}>	  Stable </option>
+			<option value={Time_Entry_State.In_Progress}> In Progress </option>
+			<option value={Time_Entry_State.Saving}> 	  Saving </option>
+			<option value={Time_Entry_State.Error}> 	  Error </option>
+			<option value={Time_Entry_State.Deleting}> 	  Deleting </option>
 		</select>
 	</div>
 	
@@ -65,10 +74,7 @@
 		<Card 
 			date_start={date_start}
 			date_end={date_end}
-			project={project}
-			task={task}
-			description={description}
-			state={state}
+			time_entry={time_entry}
 		/>
 	</div>
 </Example>
