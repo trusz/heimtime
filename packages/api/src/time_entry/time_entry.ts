@@ -89,6 +89,7 @@ export enum Time_Entry_Action {
 	Form_Or_Time_Changes = "Form_Or_Time_Changes",
 	Save_Success 		 = "Save_Success",
 	Save_Error 			 = "Save_Error",
+	Delete 			 	 = "Delete",
 }
 
 type State_Machine = {
@@ -108,10 +109,12 @@ const state_machine: State_Machine = {
 	},
 	[Time_Entry_State.Stable]: {
 		[Time_Entry_Action.Form_Or_Time_Changes]: Time_Entry_State.In_Progress,
+		[Time_Entry_Action.Delete]: 		  	  Time_Entry_State.Deleting,
 	},
 	[Time_Entry_State.Error]: {
 		[Time_Entry_Action.Form_Or_Time_Changes]: Time_Entry_State.In_Progress,
-	}
+	},
+	[Time_Entry_State.Deleting]: {},
 }
 
 export function time_entry_execute_action(

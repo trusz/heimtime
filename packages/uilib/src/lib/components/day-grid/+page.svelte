@@ -11,6 +11,8 @@
         time_entry_context_use,
         type Time_Entry,
         Time_Entry_State,
+        time_entry_execute_action,
+        Time_Entry_Action,
 	} from "@heimtime/api"
 
 	let noOfSlots = 20
@@ -19,7 +21,7 @@
 	// Context
 	// 
 	time_entry_context_init()
-	const { store_time_entry_to_save, update_time_entry_by_id } = time_entry_context_use()
+	const { store_time_entry_to_save, update_time_entry_by_id, delete_time_entry, store_time_entry_to_delete } = time_entry_context_use()
 	const projects = [
 		new_project(
 			0,
@@ -47,13 +49,16 @@
 	store_time_entry_to_save.subscribe(async (time_entries_to_save: Time_Entry[])=>{
 		await new Promise(r => setTimeout(r, 5_000))
 		for(let te of time_entries_to_save){
-			const modified_te = {
-				...te,
-				state: Time_Entry_State.Stable,
-			}
+			const modified_te = time_entry_execute_action(te, Time_Entry_Action.Save_Success)
 			update_time_entry_by_id(te.id, modified_te)
 		}
 
+	})
+	store_time_entry_to_delete.subscribe(async (time_entries_to_delete: Time_Entry[])=>{
+		await new Promise(r => setTimeout(r, 2_000))
+		for(let te of time_entries_to_delete){
+			delete_time_entry(te.id)
+		}
 	})
 
 </script>
