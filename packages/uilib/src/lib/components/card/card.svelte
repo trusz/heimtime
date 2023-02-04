@@ -1,25 +1,26 @@
 <script lang="ts">
-/*
-Layout:
-┌────────────────────────────────────────┐
-│13:00 - 14:00                       WESP│
-│                             Development│
-│                Onboarding Documentation│
-│                                        │
-└────────────────────────────────────────┘
-*/
+	/*
+	Layout:
+	┌────────────────────────────────────────┐
+	│13:00 - 14:00                       WESP│
+	│                             Development│
+	│                Onboarding Documentation│
+	│                                        │
+	└────────────────────────────────────────┘
+	*/
 
 	import { Popup } from "../popup"
 	import { EventForm } from "../event_form"
-  	import { Event_State } from "@heimtime/api";
+  	import { Event_State, type Project, type Task, date_format_time } from "@heimtime/api";
+  	import type { Event_Save } from "$lib/components/event_form/events";
 
 	// 
 	// Input Props
 	// 
 	export let date_start: Date
 	export let date_end: Date
-	export let project: string
-	export let task: string
+	export let project: Project
+	export let task: Task
 	export let description: string
 	export let state: Event_State
 
@@ -27,10 +28,10 @@ Layout:
 	let anchor: HTMLElement
 	let is_popup_open = false
 
-	const format_time = Intl.DateTimeFormat("de-DE", {timeStyle:"short"}).format
+	// const format_time = Intl.DateTimeFormat("de-DE", {timeStyle:"short"}).format
 
 	function format_time_span(start: Date, end: Date): string {
-		return `${format_time(start)} - ${format_time(end)}`
+		return `${date_format_time(start)} - ${date_format_time(end)}`
 	}
 
 	function handle_click(){
@@ -38,6 +39,9 @@ Layout:
 	}
 
 
+	function handle_save(e: CustomEvent<Event_Save>){
+
+	}
 
 
 </script>
@@ -52,13 +56,16 @@ Layout:
 	class:error={state===Event_State.Error}
 >
 	<div class="time-span">{format_time_span(date_start, date_end)}</div>
-	<div class="project">{project}</div>
-	<div class="task">{task}</div>
+	<div class="project">{project.name}</div>
+	<div class="task">{task.name}</div>
 	<div class="description">{description}</div>
 </card>
 
 <Popup bind:is_open={is_popup_open} anchor_el={anchor}>
-	<EventForm />
+	<EventForm 
+		selected_task={task}
+		on:save={handle_save}
+	/>
 </Popup>
 
 

@@ -4,19 +4,17 @@ import { Project } from "./project"
 import { Task } from "./task"
 
 
-const store_projects: Writable<Project[]> = writable([])
-
-
-const project_context = {
-	store_projects,
-	create_task,
-	create_project,
-	add_project,
+type Project_Context = {
+	store_projects: Writable<Project[]>,
+	add_project:    typeof add_project,
 }
-type Project_Context = typeof project_context
 const context_key = {}
 
 export function init_project_context(){
+	const project_context: Project_Context = {
+		store_projects: writable<Project[]>([]),
+		add_project,
+	}
 	setContext<Project_Context>(context_key, project_context)
 }
 
@@ -28,29 +26,8 @@ export function use_project_context(){
 	return ctx
 }
 
-
-// 
-// 
-// 
-
-function create_task(id: number, name: string): Task {
-	return {
-		id,
-		name,
-	}
-}
-
-
-function create_project(id:number, name:string, tasks: Task[] = []): Project {
-	return {
-		id,
-		name,
-		tasks,
-	}
-}
-
 function add_project(...new_projects: Project[]) {
-
+	const { store_projects } = use_project_context()
 	const projects = get(store_projects)
 	store_projects.set([...projects, ...new_projects])
 }

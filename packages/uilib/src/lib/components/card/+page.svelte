@@ -1,15 +1,45 @@
 <script lang="ts">
 	import { Example } from "$lib/components/internal/example"
-  import { Event_State } from "@heimtime/api";
+  import { Event_State, use_project_context, init_project_context, new_project, new_task} from "@heimtime/api";
 	import Card from "./card.svelte"
+
+	// 
+	// Context
+	// 
+	init_project_context()
+	const { add_project, store_projects } = use_project_context()
+	add_project(
+		new_project(
+			0,
+			"first",
+			[
+				new_task(0, "1.1"),
+				new_task(1, "1.2"),
+				new_task(2, "1.3"),
+			]
+		),
+		new_project(
+			1,
+			"second",
+			[
+				new_task(3, "2.1"),
+				new_task(4, "2.2"),
+				new_task(5, "2.3"),
+			]
+		)
+	)
+
+	// 
+	// Component
+	// 
 
 	let container_width = 400;
 	let container_height = 100;
 
 	let date_start = new Date("2000-01-01 13:30")
 	let date_end = new Date("2000-01-01 14:15")
-	let project = "Heimtime"
-	let task = "development"
+	$: project = $store_projects[0]
+	$: task = project.tasks[0]
 	let description = "building card component"
 	let state: Event_State = Event_State.Stable
 

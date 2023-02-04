@@ -60,7 +60,6 @@ function update_event(index:number, e:Event){
 	events_except_current.splice(index,1)
 
 	const overlapping_events = find_overlapping_events(e, events_except_current)
-	overlapping_events.length > 0 && console.log({level:"dev", msg:"found overlapping events", overlapping_events})
 
 
 	events[index] = {...e}
