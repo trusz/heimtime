@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { minutes_to_date } from "$x/date"
+
 	import DayGridLayout from "./day-grid-layout.svelte"
 	import { slot_to_minutes, type Event, use_event_context } from "@heimtime/api"
 	import { event_to_item } from "./item"
 	import { Card } from "../card"
+  	import { minutes_to_date } from "../../x/date"
 	
 	// 
 	// Input Props
@@ -19,7 +20,6 @@
 	$: shown_hours = end_hour_24 - start_hour_24
 	$: no_of_slots = shown_hours * (an_hour_in_minutes/step_in_minutes)
 	$: items = $store_events.map((event) => event_to_item(event, start_hour_24, step_in_minutes, Card))
-	$: console.log({level:"dev", msg:"items", items})
 	
 	// 
 	// Events
@@ -41,7 +41,6 @@
 		const end_minutes = slot_to_minutes(index + 1, start_hour_24, step_in_minutes)
 		let end_date = minutes_to_date(end_minutes)
 		
-		console.log({level:"dev", msg:"create::start", index, start_minutes, start_date, end_minutes, end_date})
 		
 		create_event(start_date, end_date)
 	}

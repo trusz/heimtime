@@ -5,3 +5,11 @@ export type Project = {
 	name:  string
 	tasks: Task[]
 }
+
+export function new_project(id:number, name:string, tasks: Task[] = []): Project {
+	return {
+		id,
+		name,
+		tasks,
+	}
+}

@@ -1,6 +1,6 @@
 import { suite, test, expect } from "vitest"
-import { date_to_slot, event_to_item, slot_to_minutes, type Event } from "./event"
-import type { Item, SvelteComp } from "./item"
+import { date_to_slot, Event_State, slot_to_minutes, type Event } from "@heimtime/api"
+import  { type Item, event_to_item } from "./item"
 
 suite("event", () => {
 	suite("date_to_slot", () => {
@@ -152,7 +152,7 @@ suite("event", () => {
 				event: {
 					start: new Date("2000-01-01 06:00"),
 					end:   new Date("2000-01-01 07:00"),
-					title: "not relevant",
+					state: Event_State.In_Progress
 				},
 				expected_item: {
 					start: 0,

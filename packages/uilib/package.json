@@ -1,6 +1,8 @@
 {
 	"name": "@heimtime/uilib",
 	"version": "0.0.1",
+	"main": "index.js",
+	"types": "index.d.ts",
 	"scripts": {
 		"_dev": "vite dev",
 		"dev": "npm run build:watch",

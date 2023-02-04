@@ -12,9 +12,6 @@ const config = {
 		files:{
 			routes: "src/lib",
 		},
-		alias:{
-			'$x': 'src/x'
-		},
 	},
 };
 
