@@ -2,19 +2,27 @@
 <script lang="ts">
 	import { createEventDispatcher } from "svelte"
 	import type { Item } from "./item"
+	
+	// 
+	// Input Props
+	// 
+	export let no_of_slots 	 	  = 0;
+	export let items: 	   Item[] = []
+	export let show_hours: boolean
 
+	// 
+	// Setup
+	// 
 	const dispatch 				 = createEventDispatcher()
 	const dispatchCreateStart    = (index:number) => dispatch("createstart", index)
 	const dispatchCreateProgress = (index:number) => dispatch("createprogress", index)
 	const dispatchCreateStop     = (index:number) => dispatch("createstop", index)
-
-	export let no_of_slots = 0;
-	export let items: Item[] = []
-
 	$: slots = new Array(no_of_slots).fill(null,0, no_of_slots)
 
+	// 
+	// Actions
+	// 
 	let creating = false
-
 	function handle_mouse_down(index:number){
 		dispatchCreateStart(index);
 		creating = true
@@ -39,7 +47,10 @@
 
 </script>
 
-<day-grid-layout style={`--no-of-slots:${no_of_slots}`}>
+<day-grid-layout
+	style={`--no-of-slots:${no_of_slots}`}
+	class:disable-labels={!show_hours}
+>
 	{#each slots as slot, si}
 		<div 
 			class="slot"
@@ -82,6 +93,15 @@
 		/* border: red thin solid; */
 	}
 
+	day-grid-layout.disable-labels{
+		--left-margin: 4px;
+	}
+
+	day-grid-layout.disable-labels .slot::after,
+	day-grid-layout.disable-labels .slot::before{
+		content: none;
+	}
+
 	.slot {
 		/* border-top: thin solid var(--color-blue-1); */
 		/* background-color: var(--color-blue-4); */
@@ -109,18 +129,18 @@
 
 	.slot::after,
 	.slot::before{
-		position: relative;
-		right: calc(var(--left-margin) + 0.5rem);
-		bottom: 0.5rem;
+		position:   relative;
+		right:      calc(var(--left-margin) + 0.5rem);
+		bottom:     0.5rem;
 		text-align: right;
-		width: 2ch;
-		display: inline-block;
+		width: 		2ch;
+		display: 	inline-block;
 	}
 
 	.slot::after,
 	.slot:not(.full)::after{
 		content: ":" attr(data-minutes);
-		right: calc(var(--left-margin) + 1rem - 2px);
+		right:   calc(var(--left-margin) + 1rem - 2px);
 
 		width: 3ch;
 		opacity: 0;
@@ -128,6 +148,8 @@
 
 		transition: all 50ms ease-in-out;
 	}
+
+	
 
 	.slot.full:hover::after,
 	/* .slot:not(.full):hover + .slot::after, */
