@@ -1,4 +1,5 @@
 import { Project, Task } from "../project";
+import { defaults } from "lodash"
 
 export type Time_Entry = {
 	id:   	      number;
@@ -9,6 +10,15 @@ export type Time_Entry = {
 	task?: 	      Task,
 	description?: string
 }
+
+function time_entry_default(): Time_Entry  {
+	return {
+		id:    	  -1* (Math.random()*10000|0),
+		start: 	  new Date(),
+		end:   	  new Date(),
+		state:    Time_Entry_State.In_Progress,
+	}
+} 
 
 export function new_time_entry(
 	id = -1* (Math.random()*10000|0),
@@ -29,6 +39,16 @@ export function new_time_entry(
 		task,
 		description,
 	}
+
+}
+export function new_time_entry2(
+	time_entry: Partial<Time_Entry>
+): Time_Entry {
+
+	const final_time_entry = defaults(time_entry,time_entry_default())
+
+	return final_time_entry
+
 
 }
 
@@ -102,14 +122,15 @@ const state_machine: State_Machine = {
 		[Time_Entry_Action.Creation_Progression]: Time_Entry_State.In_Progress,
 		[Time_Entry_Action.Form_Changes]: 		  Time_Entry_State.In_Progress,
 		[Time_Entry_Action.Form_Finished]: 		  Time_Entry_State.Saving,
+		[Time_Entry_Action.Delete]:	     		  Time_Entry_State.Deleting,
 	},
 	[Time_Entry_State.Saving]: {
 		[Time_Entry_Action.Save_Success]: Time_Entry_State.Stable,
 		[Time_Entry_Action.Save_Error]:   Time_Entry_State.Error,
 	},
 	[Time_Entry_State.Stable]: {
-		[Time_Entry_Action.Form_Or_Time_Changes]: Time_Entry_State.In_Progress,
-		[Time_Entry_Action.Delete]: 		  	  Time_Entry_State.Deleting,
+		[Time_Entry_Action.Form_Finished]: Time_Entry_State.Saving,
+		[Time_Entry_Action.Delete]: 	   Time_Entry_State.Deleting,
 	},
 	[Time_Entry_State.Error]: {
 		[Time_Entry_Action.Form_Or_Time_Changes]: Time_Entry_State.In_Progress,
@@ -124,6 +145,7 @@ export function time_entry_execute_action(
 	const mutated_time_entry = {...time_entry}
 	const possible_actions = state_machine[time_entry.state]
 	const new_state = possible_actions[action]
+	console.log({level:"dev", msg:"time_entry_execute_action", action, time_entry, mutated_time_entry, possible_actions, new_state})
 
 	if(!new_state){
 		return time_entry
