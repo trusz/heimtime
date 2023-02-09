@@ -135,7 +135,6 @@ export class Auth_Module {
                     "content-type":"application/json;charset=UTF-8"
                 }
             })
-            console.log({level:"dev", msg:"got token", resp})
             const body = await resp.json()
             const token = body.token
             this.save_JWT_to_local_storage(token)
@@ -144,7 +143,6 @@ export class Auth_Module {
         }
 
         if (this.account) {
-			console.log({level:"dev", msg:"show welcome message", account: this.account, response})
             // UIManager.showWelcomeMessage(this.account);
         }
     }
@@ -155,10 +153,8 @@ export class Auth_Module {
      */
     attempt_sso_silent() {
         this.myMSALObj.ssoSilent(this.silentLoginRequest).then((res) => {
-            console.log({level:"dev", msg:"sso_silent", res })
             this.account = this.getAccount();
             if (this.account) {
-				console.log({level:"dev", msg:"sso silent welcome message"})
                 // UIManager.showWelcomeMessage(this.account);
             } else {
                 console.log("No account!");

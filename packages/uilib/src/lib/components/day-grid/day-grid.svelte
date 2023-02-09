@@ -70,7 +70,6 @@
 		modified_entry.task = task
 		modified_entry.project = project
 		modified_entry.description = event.detail.description
-		console.log({level:"dev", msg:"saving", modified_entry})
 		update_time_entry_by_id(modified_entry.id, modified_entry)
 	}
 	function handle_delete(event: CustomEvent<Event_Detail_Delete>){

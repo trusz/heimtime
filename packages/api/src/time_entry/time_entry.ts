@@ -145,7 +145,6 @@ export function time_entry_execute_action(
 	const mutated_time_entry = {...time_entry}
 	const possible_actions = state_machine[time_entry.state]
 	const new_state = possible_actions[action]
-	console.log({level:"dev", msg:"time_entry_execute_action", action, time_entry, mutated_time_entry, possible_actions, new_state})
 
 	if(!new_state){
 		return time_entry
