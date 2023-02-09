@@ -2,3 +2,4 @@
 export * from "./components/button"
 export * from "./components/card"
 export * from "./components/event_form"
+export * from "./components/week-grid"

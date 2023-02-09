@@ -1,21 +1,14 @@
 <script lang="ts">
-	import { Example } from "$lib/components/internal/example"
-	import DayGridLayout from "./day-grid-layout.svelte";
-	import DayGrid from "./day-grid.svelte"
-	import { 
-		time_entry_context_init,
-		new_project, 
-		new_task,
-        time_entry_context_use,
-        type Time_Entry,
-        time_entry_execute_action,
-        Time_Entry_Action,
-        date_format_iso,
-        Time_Entry_State,
-        date_add_days,
-	} from "@heimtime/api"
+    import { Example } from "$lib/components/internal"
+    import { date_add_days, date_format_iso, date_week_frames, new_project, new_task, Time_Entry_Action, time_entry_context_init, time_entry_context_use, time_entry_execute_action, Time_Entry_State, type Time_Entry } from "@heimtime/api";
+	import WeekGrid from "./week_grid.svelte"
 
-	let no_of_slots = 20
+    function handleClick(){
+        console.log("clicked")
+    }
+
+    const [first_day, last_day] = date_week_frames(new Date())
+
 
 	// 
 	// Context
@@ -24,7 +17,7 @@
 	const { 
 		store_time_entry_to_save, 
 		store_time_entry_to_delete,
-		store_time_entry,
+        store_time_entry,
 		update_time_entry_by_id, 
 		create_time_entry,
 		create_time_entry_v2,
@@ -52,6 +45,16 @@
 		)
 	]
 
+    const project_sets = [ 
+        [...projects],
+        [...projects],
+        [...projects],
+        [...projects],
+        [...projects],
+        [...projects],
+     ]
+    
+
 	create_time_entry_v2({
 	 	start: new Date(date_format_iso(new Date())+" 08:00"),
 	 	end: new Date(date_format_iso(new Date())+" 09:30"),
@@ -60,6 +63,7 @@
 		state: Time_Entry_State.Stable,
 		description: "this was already here"
 	})
+
 	create_time_entry_v2({
 	 	start: new Date(date_format_iso(date_add_days(new Date(), 1))+" 10:00"),
 	 	end: new Date(date_format_iso(date_add_days(new Date(), 1))+" 11:30"),
@@ -69,11 +73,15 @@
 		description: "this was already here"
 	})
 
-	// 
+    // 
+    // Mockup
+    // 
+    // 
 	// API Mocks
 	// 
 	store_time_entry_to_save.subscribe(async (time_entries_to_save: Time_Entry[])=>{
-		await new Promise(r => setTimeout(r, 5_000))
+        console.log({level:"dev", msg:"saving time entry", time_entries_to_save})
+		await new Promise(r => setTimeout(r, 2_000))
 		for(let te of time_entries_to_save){
 			const modified_te = time_entry_execute_action(te, Time_Entry_Action.Save_Success)
 			update_time_entry_by_id(te.id, modified_te)
@@ -87,25 +95,21 @@
 		}
 	})
 
-	$: console.log({level:"dev", msg:"time entries changed", time_entries: $store_time_entry})
-
-	let date: Date = new Date()
-	$: console.log({level:"dev", msg:"date changed", date})
-
 </script>
 
-<Example name="Events">
-	<input type="date" on:change={(e) => date = e.target.valueAsDate} />
-	<DayGrid projects={projects} date={date} />
+<Example name="Week Grid">
+    <div class="input-container">
+        <input type="date" value={date_format_iso(first_day)} readonly />
+        <input type="date" value={date_format_iso(last_day)} readonly  />
+    </div>
+    <WeekGrid 
+        project_sets={project_sets} 
+        start_date={first_day}
+    />
 </Example>
 
-<Example name="Grid Layout">
-	<input type="range" min=10 max=72 bind:value={no_of_slots} />
-	<DayGridLayout 
-		no_of_slots={no_of_slots} 
-		on:createstart={console.log}
-		on:createprogress={console.log}
-		on:createstop={console.log}
-	/>
-
-</Example>
+<style>
+    .input-container{
+        margin-bottom: 2rem;
+    }
+</style>
