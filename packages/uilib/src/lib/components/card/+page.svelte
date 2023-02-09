@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { Example } from "$lib/components/internal/example"
-  import { Time_Entry_State, use_project_context, init_project_context, new_project, new_task, new_time_entry} from "@heimtime/api";
+  	import { Time_Entry_State, use_project_context, init_project_context, new_project, new_task, new_time_entry} from "@heimtime/api";
 	import Card from "./card.svelte"
+	import { context_card_init } from "./card_context"
 
 	// 
 	// Context
 	// 
 	init_project_context()
+	context_card_init()
 	const { add_project, store_projects } = use_project_context()
 	add_project(
 		new_project(
@@ -50,32 +52,41 @@
 	$: task = project.tasks[0]
 	let description = "building card component"
 	let state: Time_Entry_State = Time_Entry_State.Stable
+	let selected = false
 
 </script>
 
 <Example name="Card">
-	<div><label for="container_width">Container width</label></div>
-	<div><input id="container_width" type="range" min=100 max=800 bind:value={container_width} /></div>
+	<div class="example-container">
+		<div>
+			<div><label for="container_width">Container width</label></div>
+			<div><input id="container_width" type="range" min=100 max=800 bind:value={container_width} /></div>
+		</div>
 
-	<div><label for="container_width">Container height</label></div>
-	<div><input id="container_width"  type="range" min=30 max=400 bind:value={container_height} /></div>
+		<div>
+			<div><label for="container_width">Container height</label></div>
+			<div><input id="container_width"  type="range" min=30 max=400 bind:value={container_height} /></div>
+		</div>
 
-	<div>
-		<select bind:value={state}>
-			<option value={Time_Entry_State.Stable}>	  Stable </option>
-			<option value={Time_Entry_State.In_Progress}> In Progress </option>
-			<option value={Time_Entry_State.Saving}> 	  Saving </option>
-			<option value={Time_Entry_State.Error}> 	  Error </option>
-			<option value={Time_Entry_State.Deleting}> 	  Deleting </option>
-		</select>
-	</div>
-	
-	<div class="container" style={`width:${container_width}px; height:${container_height}px`}>
-		<Card 
-			date_start={date_start}
-			date_end={date_end}
-			time_entry={time_entry}
-		/>
+		<div>
+			<select bind:value={state}>
+				<option value={Time_Entry_State.Stable}>	  Stable </option>
+				<option value={Time_Entry_State.In_Progress}> In Progress </option>
+				<option value={Time_Entry_State.Saving}> 	  Saving </option>
+				<option value={Time_Entry_State.Error}> 	  Error </option>
+				<option value={Time_Entry_State.Deleting}> 	  Deleting </option>
+			</select>
+		</div>
+
+		<div class="container" style={`width:${container_width}px; height:${container_height}px`}>
+			<Card 
+				date_start={date_start}
+				date_end={date_end}
+				time_entry={time_entry}
+				selected={selected}
+				on:click={() => selected = true}
+			/>
+		</div>
 	</div>
 </Example>
 
@@ -84,5 +95,11 @@
 	.container{
 		border: gray solid thin;
 		padding: 1rem;
+	}
+
+	.example-container{ 
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
 	}
 </style>

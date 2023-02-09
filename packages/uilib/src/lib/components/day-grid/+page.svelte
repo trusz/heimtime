@@ -14,12 +14,15 @@
         Time_Entry_State,
         date_add_days,
 	} from "@heimtime/api"
+  	import { context_card_init } from "$lib/components/card/card_context";
 
 	let no_of_slots = 20
 
 	// 
 	// Context
 	// 
+
+	context_card_init()
 	time_entry_context_init()
 	const { 
 		store_time_entry_to_save, 
@@ -73,7 +76,7 @@
 	// API Mocks
 	// 
 	store_time_entry_to_save.subscribe(async (time_entries_to_save: Time_Entry[])=>{
-		await new Promise(r => setTimeout(r, 5_000))
+		await new Promise(r => setTimeout(r, 2_000))
 		for(let te of time_entries_to_save){
 			const modified_te = time_entry_execute_action(te, Time_Entry_Action.Save_Success)
 			update_time_entry_by_id(te.id, modified_te)
@@ -81,7 +84,7 @@
 
 	})
 	store_time_entry_to_delete.subscribe(async (time_entries_to_delete: Time_Entry[])=>{
-		await new Promise(r => setTimeout(r, 2_000))
+		await new Promise(r => setTimeout(r, 500))
 		for(let te of time_entries_to_delete){
 			delete_time_entry(te.id)
 		}
@@ -101,6 +104,7 @@
 	<input type="range" min=10 max=72 bind:value={no_of_slots} />
 	<DayGridLayout 
 		no_of_slots={no_of_slots} 
+		show_hours={true}
 		on:createstart={console.log}
 		on:createprogress={console.log}
 		on:createstop={console.log}
