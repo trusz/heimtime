@@ -5,11 +5,13 @@ import { Task } from "./task";
 
 export class Project_API {
 	constructor(
-		public http: HTTP,
-		public base_url: string,
-	){}
-
-	private static API_URL = "employees/29/projects"
+		public http: 		HTTP,
+		public base_url: 	string,
+		public employee_id: number,
+	){
+		this.api_url= `employees/${employee_id}/projects`
+	}
+	private api_url:string
 
 	async fetch_projects(date: Date): Promise<Project[]>{
 		const url = this.url_projects(date)
@@ -20,7 +22,7 @@ export class Project_API {
 	}
 
 	private url_projects(date: Date): string {
-		const url = new URL(Project_API.API_URL, this.base_url)
+		const url = new URL(this.api_url, this.base_url)
 		url.searchParams.set("date",date_format_iso(date))
 		return url.toString()
 	}

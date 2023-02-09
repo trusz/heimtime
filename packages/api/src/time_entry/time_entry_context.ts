@@ -1,6 +1,7 @@
 import { writable, Writable, derived, Readable, get } from "svelte/store"
 import { getContext, setContext } from "svelte"
-import { new_time_entry, Time_Entry, time_entry_overlap, Time_Entry_State } from "./time_entry"
+import { new_time_entry, new_time_entry2, Time_Entry, time_entry_overlap, Time_Entry_State } from "./time_entry"
+import { Project, Task } from "../project"
 
 
 const store_time_entry: Writable<Time_Entry[]> = writable([])
@@ -17,6 +18,7 @@ const time_entry_context = {
 	store_time_entry_to_save,
 	store_time_entry_to_delete,
 	create_time_entry,
+	create_time_entry_v2,
 	last_time_entry,
 	update_last_time_entry,
 	update_time_entry,
@@ -39,14 +41,30 @@ export function time_entry_context_use(){
 }
 
 
-function create_time_entry(start_date: Date, end_date: Date){
+function create_time_entry_v2(
+	time_entry_to_create: Partial<Time_Entry>
+){
 
-	const time_entry = new_time_entry(
-		undefined,
-		start_date,
-		end_date,
-		Time_Entry_State.In_Progress,
-	)
+	const time_entry = new_time_entry2(time_entry_to_create)
+	
+	const time_entries = get(store_time_entry)
+	store_time_entry.set( [...time_entries, time_entry] )
+}
+
+function create_time_entry(
+	start_date: Date, 
+	end_date: Date,
+	project?: Project,
+	task?: Task
+){
+
+	const time_entry = new_time_entry2({
+		start: start_date,
+		end: end_date,
+		state: Time_Entry_State.In_Progress,
+		project,
+		task,
+	})
 	
 	const time_entries = get(store_time_entry)
 	
