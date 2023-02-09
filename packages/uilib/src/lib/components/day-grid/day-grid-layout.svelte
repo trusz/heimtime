@@ -13,10 +13,10 @@
 	// 
 	// Setup
 	// 
-	const dispatch 				 = createEventDispatcher()
-	const dispatchCreateStart    = (index:number) => dispatch("createstart", index)
-	const dispatchCreateProgress = (index:number) => dispatch("createprogress", index)
-	const dispatchCreateStop     = (index:number) => dispatch("createstop", index)
+	const dispatch 				   = createEventDispatcher()
+	const dispatch_create_start    = (index:number) => dispatch("createstart", index)
+	const dispatch_create_progress = (index:number) => dispatch("createprogress", index)
+	const dispatch_create_stop     = (index:number) => dispatch("createstop", index)
 	$: slots = new Array(no_of_slots).fill(null,0, no_of_slots)
 
 	// 
@@ -24,20 +24,20 @@
 	// 
 	let creating = false
 	function handle_mouse_down(index:number){
-		dispatchCreateStart(index);
+		dispatch_create_start(index);
 		creating = true
 	}
 
 	function handle_mouse_over(index:number){
 		if(!creating){ return }
 
-		dispatchCreateProgress(index)
+		dispatch_create_progress(index)
 	}
 	
 	function handle_mouse_up(index:number){
 		if(!creating){ return }
-
-		dispatchCreateStop(index)
+		
+		dispatch_create_stop(index)
 		creating = false
 	}
 

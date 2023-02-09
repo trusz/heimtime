@@ -1,12 +1,13 @@
 <script lang="ts">
-  	import type { Event_Save } from "$lib/components/event_form/events";
-  	import { use_project_context, type Project, type Task } from "@heimtime/api";
-	import { createEventDispatcher } from "svelte"
+	import { createEventDispatcher, tick } from "svelte"
+	import type { Event_Save } from "$lib/components/event_form/events";
+	import { use_project_context, type Project, type Task } from "@heimtime/api";
 
 	// 
 	// Input Props
 	// 
 	export let selected_task: Task | undefined
+	export let is_open = false
 
 	// 
 	// Context
@@ -18,6 +19,7 @@
 	// 
 	const dispatch = createEventDispatcher()
 	let projects: Project[]
+	let anchor: HTMLElement 
 	$: projects = $store_projects
 
 	let new_selected_task: Task | undefined = selected_task
@@ -26,7 +28,7 @@
 	// 
 	// Actions
 	// 
-	function handle_submit(e:unknown){
+	function handle_submit(){
 		const detail: Event_Save = {
 			task: new_selected_task,
 			description: new_description,
@@ -37,10 +39,43 @@
 	function handle_delete(){
 		dispatch("delete")
 	}
+
+	function handle_cmd_enter(event:KeyboardEvent){
+		const has_all_keys = event.code === "Enter" && (event.metaKey || event.ctrlKey)
+		if(!has_all_keys){ return }
+		if(!is_open) { return }
+
+		handle_submit()
+	}
+
+	function handle_escape(event:KeyboardEvent){
+		const has_all_keys = event.code === "Escape"
+		if(!has_all_keys){ return }
+		if(!is_open){ return }
+
+		dispatch("close")
+	}
+
+	// TODO: fix this
+	// if we have this enabled we cannot open the form on creation-end
+	// because we "clicking" outside of the form
+	// async function handle_outside_click(event: MouseEvent){
+	// 	const clicked_inside_form = anchor.contains(event.target as HTMLElement)
+	// 	console.log({level:"dev", msg:"clicked inside?", clicked_inside_form, is_open})
+	// 	if(clicked_inside_form){ return }
+	// 	if(!is_open){ return }
+
+	// 	dispatch("close")
+	// }
 	
 </script>
 
-<event-form>
+<svelte:body 
+	on:keydown={handle_cmd_enter} 
+	on:keydown={handle_escape}
+/> 
+
+<event-form bind:this={anchor}>
 	<form on:submit={handle_submit}>
 	<label>
 		<span>Task</span>

@@ -10,11 +10,12 @@
 	*/
 
 	import { createEventDispatcher } from "svelte"
-	import { Time_Entry_State, type Project, type Task, date_format_time, type Time_Entry } from "@heimtime/api";
+	import { Time_Entry_State, date_format_time, type Time_Entry } from "@heimtime/api";
 	import type { Event_Save } from "$lib/components/event_form/events";
+	import type { Event_Detail_Delete } from "$lib/components/card/card_events";
 	import { Popup } from "../popup"
 	import { EventForm } from "../event_form"
-  import type { Event_Detail_Delete } from "$lib/components/card/card_events";
+	import { context_card_use } from "./card_context"
 
 	// 
 	// Input Props
@@ -22,31 +23,58 @@
 	export let date_start: Date
 	export let date_end: Date
 	export let time_entry: Time_Entry
+	export let selected: boolean = false
 
-
+	// 
+	// Config
+	// 
 	let anchor: HTMLElement
-	let is_popup_open = false
 
-	// const format_time = Intl.DateTimeFormat("de-DE", {timeStyle:"short"}).format
+	// 
+	// Setup
+	// 
+	const context_card = context_card_use()
+	const store = context_card.store
+	$: state = $store.get(time_entry.id)
+	$: selected = state?.is_selected ?? false
+	$: is_form_open = state?.is_form_open ?? false
 
+
+	// 
+	// Actions
+	// 
 	function format_time_span(start: Date, end: Date): string {
 		return `${date_format_time(start)} - ${date_format_time(end)}`
 	}
 
-	function handle_click(){
-		is_popup_open = true
+	function handle_click(event: MouseEvent){
+		const is_addition = event.metaKey || event.ctrlKey
+		if(is_addition){
+			context_card.select_card_add(time_entry.id)
+			return
+		}
+
+		context_card.select_card(time_entry.id)
+	}
+
+	function handle_dbclick(){
+		context_card.open_form(time_entry.id)
 	}
 
 	const dispatch = createEventDispatcher()
 	function handle_save(e: CustomEvent<Event_Save>){
 		dispatch("save", e.detail)
-		is_popup_open = false
+		context_card.close_form(time_entry.id)
 	}
 
 	function handle_delete(){
 		const detail: Event_Detail_Delete = {id: time_entry.id}
 		dispatch("delete", detail)
-		is_popup_open = false
+		context_card.close_form(time_entry.id)
+	}
+
+	function handle_close(){
+		context_card.close_form(time_entry.id)
 	}
 
 	$: project_name = time_entry.project?.name ?? ""
@@ -56,14 +84,16 @@
 </script>
 
 <card 
-	on:dblclick={handle_click} 
+	on:click={handle_click}
+	on:dblclick={handle_dbclick}
 	on:keypress 
 	bind:this={anchor} 
-	class:stable={time_entry.state === Time_Entry_State.Stable}
-	class:in-progress={time_entry.state === Time_Entry_State.In_Progress}
-	class:saving={time_entry.state === Time_Entry_State.Saving}
-	class:error={time_entry.state === Time_Entry_State.Error}
-	class:deleting={time_entry.state === Time_Entry_State.Deleting}
+	class:selected
+	class:stable      = {time_entry.state === Time_Entry_State.Stable}
+	class:in-progress = {time_entry.state === Time_Entry_State.In_Progress}
+	class:saving 	  = {time_entry.state === Time_Entry_State.Saving}
+	class:error		  = {time_entry.state === Time_Entry_State.Error}
+	class:deleting	  = {time_entry.state === Time_Entry_State.Deleting}
 >
 	<div class="time-span">{format_time_span(date_start, date_end)}</div>
 	<div class="project">{project_name}</div>
@@ -71,11 +101,13 @@
 	<div class="description">{description}</div>
 </card>
 
-<Popup bind:is_open={is_popup_open} anchor_el={anchor}>
+<Popup bind:is_open={is_form_open} anchor_el={anchor}>
 	<EventForm 
 		selected_task={time_entry.task}
+		is_open={is_form_open}
 		on:save={handle_save}
 		on:delete={handle_delete}
+		on:close={handle_close}
 	/>
 </Popup>
 
@@ -97,7 +129,7 @@
 		grid-auto-rows: 1rem;
 		overflow: hidden;
 
-		transition: all 1000ms;
+		transition: all 100ms;
 
 	}
 
@@ -127,6 +159,10 @@
 	
 	card.deleting {
 		opacity: 0.5;
+	}
+
+	card.selected {
+		background-color: rgba(255,255,255,0.3);
 	}
 	
 

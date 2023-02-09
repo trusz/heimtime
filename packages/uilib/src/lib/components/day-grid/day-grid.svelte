@@ -2,7 +2,7 @@
 	import DayGridLayout from "./day-grid-layout.svelte"
 	import { slot_to_minutes, type Time_Entry, time_entry_context_use, use_project_context, type Project, init_project_context, Time_Entry_State, time_entry_execute_action, Time_Entry_Action, date_format_iso } from "@heimtime/api"
 	import { time_entry_to_item } from "./item"
-	import { Card } from "../card"
+	import { Card, context_card_use } from "../card"
   	import { minutes_to_date } from "../../x/date"
   	import type { Event_Save } from "$lib/components/event_form/events";
   	import type { Event_Detail_Delete } from "$lib/components/card/card_events";
@@ -25,7 +25,8 @@
 	*/
 	init_project_context()
 	const { set_projects, store_projects } = use_project_context()
-	set_projects(projects)
+	set_projects(projects)	
+	const card_context = context_card_use()
 
 	/**
 	 * We use the time entry context and filter for the given date
@@ -72,8 +73,14 @@
 		modified_entry.description = event.detail.description
 		update_time_entry_by_id(modified_entry.id, modified_entry)
 	}
+
 	function handle_delete(event: CustomEvent<Event_Detail_Delete>){
 		const id = event.detail.id
+		delete_card_by_id(id)
+
+	}
+
+	function delete_card_by_id(id: number){
 		const time_entry_to_delete = $store_time_entry.find(te => te.id === id)
 		if(!time_entry_to_delete){
 			console.log({level:"warn", msg:"could not find time entry to delete, stopping", id})
@@ -81,7 +88,6 @@
 		}
 		const modified_te = time_entry_execute_action(time_entry_to_delete, Time_Entry_Action.Delete)
 		update_time_entry_by_id(id, modified_te)
-
 	}
 
 	
@@ -125,11 +131,28 @@
 		new_time_entry.end = end_date
 		update_last_time_entry(new_time_entry)
 	}
+
+	function handle_create_stop(e: CustomEvent<number>){
+		// Note: getting the last time entry could be dangerous later
+		const time_entry = last_time_entry()
+		card_context.open_form(time_entry.id)
+	}
 	
+	function handle_keydown(event: KeyboardEvent){
+		const has_all_keys = event.key === "Backspace" && event.metaKey
+		if(!has_all_keys){
+			return
+		}
+		const selected_card_ids = card_context.get_selected_card_ids()
+		for(const id of selected_card_ids){
+			delete_card_by_id(id)
+		}
+	}
 	
 	
 </script>
 
+<svelte:body on:keydown={handle_keydown} />
 
 <DayGridLayout 
 	no_of_slots={no_of_slots}
@@ -137,5 +160,5 @@
 	show_hours={show_hours}
 	on:createstart={handle_create_start}
 	on:createprogress={handle_create_progress}
-	on:createstop={console.log}
+	on:createstop={handle_create_stop}
 />

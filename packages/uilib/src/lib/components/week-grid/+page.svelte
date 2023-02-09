@@ -2,6 +2,7 @@
     import { Example } from "$lib/components/internal"
     import { date_add_days, date_format_iso, date_week_frames, new_project, new_task, Time_Entry_Action, time_entry_context_init, time_entry_context_use, time_entry_execute_action, Time_Entry_State, type Time_Entry } from "@heimtime/api";
 	import WeekGrid from "./week_grid.svelte"
+	import { context_card_init } from "../card"
 
     function handleClick(){
         console.log("clicked")
@@ -14,6 +15,7 @@
 	// Context
 	// 
 	time_entry_context_init()
+	context_card_init()
 	const { 
 		store_time_entry_to_save, 
 		store_time_entry_to_delete,
