@@ -6,7 +6,6 @@ export class API {
 		private base_url: string = "",
 	){
 		const claims = parse_jwt<Claims>(jwt)
-		console.log({level:"dev", msg:" new api, parsing jwt", claims})
 		this.http = new HTTP(jwt)
 		this.project_api = new Project_API(this.http, base_url, claims.employeeId)
 		this.time_entry_api = new Time_Entry_API(this.http, base_url, claims.employeeId)

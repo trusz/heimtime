@@ -82,7 +82,6 @@ function update_last_time_entry(time_entry: Time_Entry){
 }
 
 function update_time_entry(index:number, time_entry:Time_Entry){
-	console.log({level:"dev", msg:"updating time entry", index, time_entry})
 	const time_entries = get(store_time_entry)
 	const time_entries_except_current = [...time_entries]
 	time_entries_except_current.splice(index,1)

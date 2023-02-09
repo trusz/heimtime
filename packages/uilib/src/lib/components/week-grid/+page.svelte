@@ -80,7 +80,6 @@
 	// API Mocks
 	// 
 	store_time_entry_to_save.subscribe(async (time_entries_to_save: Time_Entry[])=>{
-        console.log({level:"dev", msg:"saving time entry", time_entries_to_save})
 		await new Promise(r => setTimeout(r, 2_000))
 		for(let te of time_entries_to_save){
 			const modified_te = time_entry_execute_action(te, Time_Entry_Action.Save_Success)

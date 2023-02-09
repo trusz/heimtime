@@ -87,10 +87,8 @@
 		}
 	})
 
-	$: console.log({level:"dev", msg:"time entries changed", time_entries: $store_time_entry})
 
 	let date: Date = new Date()
-	$: console.log({level:"dev", msg:"date changed", date})
 
 </script>
 

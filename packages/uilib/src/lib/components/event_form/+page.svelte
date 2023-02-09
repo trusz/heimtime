@@ -42,7 +42,6 @@
 	}($store_projects))
 
 	function handle_save(e: CustomEvent<Event_Save>){
-		console.log({level:"dev", msg:"handling save", detail: e.detail})
 	}
 
 </script>

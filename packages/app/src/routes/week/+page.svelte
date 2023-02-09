@@ -11,9 +11,7 @@
 	const {add_project, store_projects } = use_project_context()
 
 	onMount(async ()=>{
-		console.log({level:"dev", msg:"week on mount"})
 		const projects = await api.fetch_projects()
-		console.log({level:"dev", msg:"available projects", projects})
 		add_project(...projects)
 
 	})
