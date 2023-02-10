@@ -16,6 +16,7 @@
 	import { Popup } from "../popup"
 	import { EventForm } from "../event_form"
 	import { context_card_use } from "./card_context"
+  	import { string_to_color } from "$lib/components/card/color-hash";
 
 	// 
 	// Input Props
@@ -25,6 +26,13 @@
 	export let time_entry: Time_Entry
 	export let selected: boolean = false
 
+
+	const transparency_hex_default = "40"
+	const transparency_hex_select = "60"
+	let color = "#ffffff18"
+	$: color = string_to_color(time_entry.project?.name??"")
+	$: bg_color = color + transparency_hex_default
+	$: bg_color_select = color + transparency_hex_select
 	// 
 	// Config
 	// 
@@ -94,6 +102,9 @@
 	class:saving 	  = {time_entry.state === Time_Entry_State.Saving}
 	class:error		  = {time_entry.state === Time_Entry_State.Error}
 	class:deleting	  = {time_entry.state === Time_Entry_State.Deleting}
+
+	style={`--bg-color:${bg_color}; --bg-color-select:${bg_color_select}`}
+
 >
 	<div class="time-span">{format_time_span(date_start, date_end)}</div>
 	<div class="project">{project_name}</div>
@@ -121,7 +132,7 @@
 		gap: 			  0px;
 		height:  	      100%;
 		border-radius:    var(--border-radius);
-		background-color: rgba(255,255,255,0.1);
+		background-color: var(--bg-color, #ffffff18);
 		backdrop-filter:  blur(3px);
 
 		padding: 0.3rem 0.5rem;
@@ -164,7 +175,7 @@
 	}
 
 	card.selected {
-		background-color: rgba(255,255,255,0.3);
+		background-color: var(--bg-color-select,  rgba(255,255,255,0.3));
 	}
 	
 
