@@ -127,7 +127,7 @@ export class Auth_Module {
         if (response !== null) {
             this.account = response.account;
             const idToken = response.idToken
-            const url = new URL("authentication/oidc", this.heimat_base_url)
+            const url = new URL("api/v1/authentication/oidc", this.heimat_base_url)
             const resp = await fetch(url,{
                 method: "POST",
                 body: JSON.stringify({token: idToken}),

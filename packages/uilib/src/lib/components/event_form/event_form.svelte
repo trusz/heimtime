@@ -8,6 +8,7 @@
 	// 
 	export let selected_task: Task | undefined
 	export let is_open = false
+	export let description: string | undefined
 
 	// 
 	// Context
@@ -22,17 +23,33 @@
 	let anchor: HTMLElement 
 	$: projects = $store_projects
 
-	let new_selected_task: Task | undefined = selected_task
-	let new_description = ""
+	let new_selected_task: Task | undefined
+	let new_description = description
 
 	// 
 	// Actions
 	// 
-	function handle_submit(){
+	function handle_task_change(e: Event){
+		const target = e.target as HTMLSelectElement
+		const task_id = target.value
+		console.log({level:"dev", msg:"handle_task_change", task_id})
+
+		for(const p of projects){
+			const t = p.tasks.find( t => String(t.id) === task_id)
+			if(t){
+				new_selected_task = t
+				break;
+			}
+
+		}
+	}
+
+	function handle_submit(){	
 		const detail: Event_Save = {
 			task: new_selected_task,
 			description: new_description,
 		}
+		console.log({level:"dev", msg:"submiting", detail})
 		dispatch("save", detail)
 	}
 
@@ -79,11 +96,13 @@
 	<form on:submit={handle_submit}>
 	<label>
 		<span>Task</span>
-		<select bind:value={new_selected_task}>
+		<select on:change={handle_task_change}>
 			{#each projects as project}
 				<optgroup label={project.name}>
 					{#each project.tasks as task}
-						<option value={task}>{task.name}</option>
+						<option selected={selected_task?.id === task.id} value={task.id}>
+							{task.id} {task.name}
+						</option>
 					{/each}
 				</optgroup>
 			{/each}

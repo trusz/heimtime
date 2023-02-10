@@ -34,6 +34,7 @@ export function time_entry_to_item(
 		end:   date_to_slot(end_date, start_hour, step_in_minutes),
 		component: comp,
 		props: {
+			id: 		 time_entry.id,
 			date_start:  start_date,
 			date_end: 	 end_date,
 			time_entry:  time_entry,

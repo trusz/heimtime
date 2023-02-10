@@ -104,6 +104,7 @@
 <Popup bind:is_open={is_form_open} anchor_el={anchor}>
 	<EventForm 
 		selected_task={time_entry.task}
+		description={time_entry.description}
 		is_open={is_form_open}
 		on:save={handle_save}
 		on:delete={handle_delete}
@@ -129,8 +130,9 @@
 		grid-auto-rows: 1rem;
 		overflow: hidden;
 
-		transition: all 100ms;
+		user-select: none;
 
+		transition: opacity 100ms;
 	}
 
 	card.in-progress{

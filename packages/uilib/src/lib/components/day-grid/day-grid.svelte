@@ -1,6 +1,6 @@
 <script lang="ts">time_entry_to_item
 	import DayGridLayout from "./day-grid-layout.svelte"
-	import { slot_to_minutes, type Time_Entry, time_entry_context_use, use_project_context, type Project, init_project_context, Time_Entry_State, time_entry_execute_action, Time_Entry_Action, date_format_iso } from "@heimtime/api"
+	import { slot_to_minutes, type Time_Entry, time_entry_context_use, use_project_context, type Project, init_project_context, Time_Entry_State, time_entry_execute_action, Time_Entry_Action, date_format_iso, new_time_entry } from "@heimtime/api"
 	import { time_entry_to_item } from "./item"
 	import { Card, context_card_use } from "../card"
   	import { minutes_to_date } from "../../x/date"
@@ -25,7 +25,7 @@
 	*/
 	init_project_context()
 	const { set_projects, store_projects } = use_project_context()
-	set_projects(projects)	
+	$: set_projects(projects)
 	const card_context = context_card_use()
 
 	/**
@@ -131,6 +131,43 @@
 		new_time_entry.end = end_date
 		update_last_time_entry(new_time_entry)
 	}
+	function handle_resize_progress(e: CustomEvent<{index:number, id:number}>){
+		const {index, id} = e.detail
+		const time_entry = $store_time_entry.find(te => te.id === id )
+		console.log({level:"dev", msg:"handling resize", index, id, time_entry, $store_time_entry})
+		if(!time_entry){
+			console.log({level:"error", msg:"could not find time entry by id, stopping", id})
+			return
+		}
+		let new_time_entry = {...time_entry}
+
+		let end_minutes = slot_to_minutes(index + 1, start_hour_24, step_in_minutes)
+		let end_date = minutes_to_date(end_minutes, date)
+		
+		const is_dragging_bottom_to_top = time_entry.start.getTime() > end_date.getTime()
+		if( is_dragging_bottom_to_top ){
+			end_minutes = slot_to_minutes(index , start_hour_24, step_in_minutes)
+			end_date = minutes_to_date(end_minutes, date)
+		}
+		
+		new_time_entry.end = end_date
+		new_time_entry = time_entry_execute_action(new_time_entry,Time_Entry_Action.Form_Or_Time_Changes)
+		update_time_entry_by_id(id, new_time_entry)
+		
+	}
+
+	function handle_resize_done(e:CustomEvent<number>){
+		const id = e.detail
+		const time_entry = $store_time_entry.find(te => te.id === id )
+
+		if(!time_entry){
+			console.log({level:"error", msg:"could not find time entry by id, stopping", id})
+			return
+		}
+
+		const new_time_entry = time_entry_execute_action(time_entry, Time_Entry_Action.Form_Finished)
+		update_time_entry_by_id(id, new_time_entry)
+	}
 
 	function handle_create_stop(e: CustomEvent<number>){
 		// Note: getting the last time entry could be dangerous later
@@ -138,21 +175,10 @@
 		card_context.open_form(time_entry.id)
 	}
 	
-	function handle_keydown(event: KeyboardEvent){
-		const has_all_keys = event.key === "Backspace" && event.metaKey
-		if(!has_all_keys){
-			return
-		}
-		const selected_card_ids = card_context.get_selected_card_ids()
-		for(const id of selected_card_ids){
-			delete_card_by_id(id)
-		}
-	}
+	
 	
 	
 </script>
-
-<svelte:body on:keydown={handle_keydown} />
 
 <DayGridLayout 
 	no_of_slots={no_of_slots}
@@ -161,4 +187,6 @@
 	on:createstart={handle_create_start}
 	on:createprogress={handle_create_progress}
 	on:createstop={handle_create_stop}
+	on:resizeprogress={handle_resize_progress}
+	on:resizedone={handle_resize_done}
 />

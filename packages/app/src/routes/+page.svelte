@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { Auth_Module } from "@heimtime/api";
-  import { context_api_create, context_api_get } from "../api";
+  import { context_api_create, context_api_get, parse_jwt, type Claims } from "../api";
   import { onMount } from "svelte";
 
 	export const ssr = false;
@@ -20,6 +20,7 @@
 		auth_module = new Auth_Module(base_url);
 		await auth_module.load();
 		const jwt = auth_module.jwt_get()
+		console.log({level:"dev", msg:"checking jwt", jwt})
 		if(!jwt || jwt === ""){ return }
 		
 		api.jwt_set(jwt)

@@ -1,30 +1,67 @@
 <script lang="ts">
 	import { context_api_get } from "../../api"
 	import {onMount} from "svelte"
-  	import { use_project_context, init_project_context } from "@heimtime/api";
-	import { EventForm } from "@heimtime/uilib"
+  	import { 
+		date_week_frames, 
+		type Project, 
+		date_add_days, 
+		time_entry_context_init,
+        time_entry_context_use,
+	} from "@heimtime/api";
+	import { WeekGrid, context_card_init } from "@heimtime/uilib"
+	import { time_entry_sync } from "./time_entry_sync"
 	
+	// 
+	// Config
+	// 
 	export const ssr = false;
 	export const prerender = false;
 	const api = context_api_get()
-	init_project_context()
-	const {add_project, store_projects } = use_project_context()
+	
+	// 
+	// Setup
+	// 
+	context_card_init()
+	console.log({level:"dev", msg:"time_entry_context_init"})
+	time_entry_context_init()
 
-	onMount(async ()=>{
-		const projects = await api.fetch_projects()
-		add_project(...projects)
+	const [date_start, date_end] = date_week_frames()
+	const time_entry_context = time_entry_context_use()
+	const { create_time_entry_v2 } = time_entry_context
 
-	})
+	let project_sets: Project[][] = []
+ 
+	load_project_sets()
+	time_entry_sync(api)
+
+
+
+	// 
+	// Functions
+	// 
+	async function load_project_sets(){
+		let project_promises: Promise<Project[]>[] = []
+		for(let di=0; di<7; di++){
+			const d = date_add_days(date_start, di)
+			const prom = api.fetch_projects(d)
+			project_promises.push(prom)
+		}
+
+		project_sets = await Promise.all(project_promises)
+		const time_entires = await api.fetch_time_entires(date_start, date_end)
+		for(const te of time_entires){
+			create_time_entry_v2(te)
+		}
+
+		// return sets
+	}
+	
 
 
 </script>
 
-<h1>Week</h1>
+<week>
+	<h1>Week</h1>
 
-<EventForm />
-
-<ul>
-	{#each $store_projects as project }
-		<li>{project.name}</li>
-	{/each}
-</ul>
+	<WeekGrid project_sets={project_sets} start_date={date_start} />
+</week>

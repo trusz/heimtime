@@ -1,5 +1,6 @@
 export * from "./src/time_entry"
 export * from "./src/project"
+export * from "./src/employee"
 export * from "./src/auth"
 export * from "./src/x/http"
 export * from "./src/x/date"
