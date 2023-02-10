@@ -30,13 +30,14 @@
 	const transparency_hex_default = "40"
 	const transparency_hex_border = "60"
 	const transparency_hex_select = "60"
-	const transparency_hex_border_select = "80"
+	const transparency_hex_border_select = "40"
 	let color = "#ffffff18"
 	$: color = string_to_color( time_entry.project?.name??"" )
 	$: bg_color = color + transparency_hex_default
 	$: bg_color_select = color + transparency_hex_select
 	$: border_color = color + transparency_hex_border
-	$: border_color_select = color + transparency_hex_border_select
+	// $: border_color_select = color + transparency_hex_border_select
+	$: border_color_select = "#ffffff" + transparency_hex_border_select
 	// 
 	// Config
 	// 
@@ -117,7 +118,8 @@
 	style={style}
 
 >
-	<div class="time-span">{format_time_span(date_start, date_end)}</div>
+	<!-- <div class="time-span">{format_time_span(date_start, date_end)}</div> -->
+	<div class="time-span">{date_format_time(date_start)} <br /> {date_format_time(date_end)}</div>
 	<div class="project">{project_name}</div>
 	<div class="task">{task_name}</div>
 	<div class="description">{description}</div>
@@ -138,7 +140,7 @@
 <style>
 	card{
 
-		border:  	      var(--border-color, rgba(255,255,255,0.1)) solid thin;
+		border:  	      var(--border-color, rgba(255,255,255,0.1)) solid 2px;
 		display: 	      grid;
 		gap: 			  0.75rem;
 		height:  	      100%;
@@ -147,7 +149,7 @@
 		backdrop-filter:  blur(3px);
 
 		padding: 0.3rem 0.5rem;
-		margin:  0 1rem;
+		margin:  0 0.2rem;
 		grid-template-columns: 1fr auto;
 		grid-auto-rows: min-content;
 		overflow: hidden;
@@ -186,7 +188,7 @@
 	}
 
 	card.selected {
-		border:  	      var(--border-color_select, rgba(255,255,255,0.1)) solid thin;
+		border-color:  	  var(--border-color-select, rgba(255,255,255,0.1));
 		background-color: var(--bg-color-select,  rgba(255,255,255,0.3));
 	}
 	
@@ -212,9 +214,14 @@
 	.task,
 	.description{
 		text-align: right;
-		justify-self: end;
+		justify-self: start;
 		grid-column-start: 2;
 		grid-column-end: 3;
+
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		max-width: 100%;
 	}
 
 	card > div {
