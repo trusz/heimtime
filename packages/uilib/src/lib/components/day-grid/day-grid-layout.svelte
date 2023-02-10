@@ -42,6 +42,12 @@
 	
 	function handle_mouse_up(index:number){
 		if(!creating){ return }
+
+		if(resizing_id !== -1){
+			dispatch_resize_done(resizing_id)
+			creating = false
+			return
+		}
 		
 		dispatch_create_stop(index)
 		creating = false
@@ -54,9 +60,11 @@
 		creating = true
 	}
 
-	function handle_resize_mouse_up(){
+	function handle_resize_mouse_up(id: number){
+		console.log({level:"dev", msg:"handle_resize_mouse_up", id})
 		resizing_id = -1
 		creating = false
+		dispatch_resize_done(id)
 	}
 
 	function zeroPadding(n:number): string {
@@ -100,7 +108,7 @@
 			<div 
 				class="resizer" 
 				on:mousedown={() => handle_resize_mouse_down(item.props.id)}
-				on:mouseup={handle_resize_mouse_up}
+				on:mouseup={() => handle_resize_mouse_up(item.props.id)}
 			>
 				&nbsp;
 			</div>

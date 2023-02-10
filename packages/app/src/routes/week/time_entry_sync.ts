@@ -20,14 +20,20 @@ export function time_entry_sync(api:API, ){
 
 	store_time_entry_to_save.subscribe(async (time_entries_to_save: Time_Entry[])=>{
 		for(const te of time_entries_to_save){
-			await api.save_time_entry(te)
-			console.log({level:"dev", msg:"saved entry", te})
+			if(te.id < 0 ){
+				await api.save_time_entry(te)
+			}else {
+				await api.update_time_entry(te)
+			}
+			
 			const modified_te = time_entry_execute_action(te, Time_Entry_Action.Save_Success)
 
-			const saved_time_entires = await api.fetch_time_entires(te.start, te.start)
-			const saved_entry = find_matching_time_entry(te, saved_time_entires)
-			if(saved_entry){
-				modified_te.id = saved_entry.id
+			if( te.id < 0){
+				const saved_time_entires = await api.fetch_time_entires(te.start, te.start)
+				const saved_entry = find_matching_time_entry(te, saved_time_entires)
+				if(saved_entry){
+					modified_te.id = saved_entry.id
+				}
 			}
 
 			update_time_entry_by_id(te.id, modified_te)
