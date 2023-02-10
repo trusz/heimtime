@@ -5,11 +5,11 @@ import { Project, Task } from "../project"
 
 
 const store_time_entry: Writable<Time_Entry[]> = writable([])
-const store_time_entry_to_save = derived(store_time_entry, (events:Time_Entry[]) => {
-	return events.filter( (e) => e.state === Time_Entry_State.Saving  )
+const store_time_entry_to_save = derived(store_time_entry, (time_entires:Time_Entry[]) => {
+	return time_entires.filter( (e) => e.state === Time_Entry_State.Saving  )
 })
-const store_time_entry_to_delete = derived(store_time_entry, (events:Time_Entry[]) => {
-	return events.filter( (e) => e.state === Time_Entry_State.Deleting  )
+const store_time_entry_to_delete = derived(store_time_entry, (time_entires:Time_Entry[]) => {
+	return time_entires.filter( (e) => e.state === Time_Entry_State.Deleting  )
 })
 
 
@@ -25,7 +25,7 @@ const time_entry_context = {
 	update_time_entry_by_id,
 	delete_time_entry,
 }
-type Time_Entry_Context = typeof time_entry_context
+export type Time_Entry_Context = typeof time_entry_context
 const context_key = {}
 
 export function time_entry_context_init(){

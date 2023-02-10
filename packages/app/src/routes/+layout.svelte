@@ -25,10 +25,22 @@
 	// 
 	context_api_create()
 	let api = context_api_get()
-	api.set_base_url(base_url)
-	api.jwt_set(jwt)
+	if(jwt && jwt !== ""){
+
+		api.set_base_url(base_url)
+		api.jwt_set(jwt)
+	}
 	
 	onMount( async () => {
+		try{
+			await api.fetch_employee(api.employee_id)
+		} catch(err){
+			console.error({level:"dev", msg:"could not fetch employee info", err})
+			if($page.route.id==="/"){ return }
+			api.jwt_set("")
+			goto("/")
+		}
+
 		if(!jwt || jwt === ""){
 			console.log({level:"warn", msg:"no jwt found, start login process"})
 			if($page.route.id==="/"){ return }

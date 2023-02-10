@@ -60,7 +60,7 @@
 
 <style>
 	popup{
-		display: inline-block;
+		display: inline;
 	}
 	
 
@@ -81,7 +81,7 @@
 	}
 
 	.popup.show{
-		display: inline-block;
+		display: inline;
 
 	}
 </style>
