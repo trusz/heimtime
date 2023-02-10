@@ -1,5 +1,12 @@
+
+const DEFAULT_COLOR ="#f2f2f2"
+
 // https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
 export function string_to_color(str: string): string {
+    if(str===""){
+        return DEFAULT_COLOR
+    }
+
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
         hash = str.charCodeAt(i) + ((hash << 5) - hash);
@@ -7,8 +14,6 @@ export function string_to_color(str: string): string {
     
     let color_hex = ""
     
-    
-    // debugger;
     for (let i = 0; i < 3; i++) {
         const value = (hash >> (i * 8)) & 0xFF;
         const c = value.toString(16)[1].repeat(2)
@@ -23,10 +28,9 @@ export function string_to_color(str: string): string {
     const color_rgb2 = hsv_to_rgb(color_hsv.h, color_hsv.s, color_hsv.v)
     const color_hex2 = rgb_to_hex(color_rgb2.r, color_rgb2.g, color_rgb2.b)
 
-    console.log({level:"dev", msg:"color transform", color_hex, color_rgb, color_hsv, color_rgb2, color_hex2})
+    // console.log({level:"dev", msg:"color transform", color_hex, color_rgb, color_hsv, color_rgb2, color_hex2})
 
     const colour = '#'+color_hex2;
-    console.log({level:"dev", msg:"stringtocolor", str, colour})
     return colour
 }
 

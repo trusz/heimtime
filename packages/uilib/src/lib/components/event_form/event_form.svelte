@@ -23,7 +23,7 @@
 	let anchor: HTMLElement 
 	$: projects = $store_projects
 
-	let new_selected_task: Task | undefined = selected_task
+	let new_selected_task: Task | undefined = selected_task || $store_projects[0].tasks[0]
 	let new_description = description
 
 	// 
@@ -48,6 +48,7 @@
 			task: new_selected_task,
 			description: new_description,
 		}
+		console.log({level:"dev", msg:"submitting", detail })
 		dispatch("save", detail)
 	}
 
@@ -99,7 +100,8 @@
 				<optgroup label={project.name}>
 					{#each project.tasks as task}
 						<option selected={selected_task?.id === task.id} value={task.id}>
-							{task.id} {task.name}
+							{task.id} | 
+							{task.name}
 						</option>
 					{/each}
 				</optgroup>

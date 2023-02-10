@@ -46,7 +46,7 @@
 	// 
 	const an_hour_in_minutes = 60
 	$: shown_hours = end_hour_24 - start_hour_24
-	$: no_of_slots = shown_hours * (an_hour_in_minutes/step_in_minutes)
+	$: no_of_slots = shown_hours * (an_hour_in_minutes/step_in_minutes) + 1
 	$: given_days_time_entries = $store_time_entry.filter((te) => date_format_iso(te.start) === date_format_iso(date))
 	$: items = given_days_time_entries.map((te ,tei) => 
 			time_entry_to_item(
@@ -131,27 +131,32 @@
 		new_time_entry.end = end_date
 		update_last_time_entry(new_time_entry)
 	}
-	function handle_resize_progress(e: CustomEvent<{index:number, id:number}>){
-		const {index, id} = e.detail
+	function handle_resize_progress(e: CustomEvent<{index:number, id:number, up:boolean}>){
+		const {index, id, up} = e.detail
 		const time_entry = $store_time_entry.find(te => te.id === id )
-		console.log({level:"dev", msg:"handling resize", index, id, time_entry, $store_time_entry})
+		console.log({level:"dev", msg:"handling resize", index, id, time_entry, $store_time_entry, up})
 		if(!time_entry){
 			console.log({level:"error", msg:"could not find time entry by id, stopping", id})
 			return
 		}
 		let new_time_entry = {...time_entry}
 
-		let end_minutes = slot_to_minutes(index + 1, start_hour_24, step_in_minutes)
-		let end_date = minutes_to_date(end_minutes, date)
+		let new_minutes = slot_to_minutes(index + 1, start_hour_24, step_in_minutes)
+		let new_date = minutes_to_date(new_minutes, date)
 		
-		const is_dragging_bottom_to_top = time_entry.start.getTime() > end_date.getTime()
+		const is_dragging_bottom_to_top = time_entry.start.getTime() > new_date.getTime()
 		if( is_dragging_bottom_to_top ){
-			end_minutes = slot_to_minutes(index , start_hour_24, step_in_minutes)
-			end_date = minutes_to_date(end_minutes, date)
+			new_minutes = slot_to_minutes(index , start_hour_24, step_in_minutes)
+			new_date = minutes_to_date(new_minutes, date)
 		}
 		
-		new_time_entry.end = end_date
+		if(up){
+			new_time_entry.start = new_date
+		}else{
+			new_time_entry.end = new_date
+		}
 		new_time_entry = time_entry_execute_action(new_time_entry,Time_Entry_Action.Form_Or_Time_Changes)
+		console.log({level:"dev", msg:"handle_resize_progress", new_time_entry})
 		update_time_entry_by_id(id, new_time_entry)
 		
 	}
