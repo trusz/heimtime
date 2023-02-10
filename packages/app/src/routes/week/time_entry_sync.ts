@@ -4,6 +4,7 @@ import {
 	Time_Entry_Action,
 	time_entry_context_use,
 	time_entry_execute_action,
+	time_entry_overlap,
 	type Time_Entry,
 } from "@heimtime/api"
 import type { API } from "src/api"
@@ -41,10 +42,14 @@ export function time_entry_sync(api:API, ){
 				const saved_entry = find_matching_time_entry(te, saved_time_entires)
 				if(saved_entry){
 					modified_te.id = saved_entry.id
+					update_time_entry_by_id(te.id, modified_te)
+				}
+
+				for(const saved_te of saved_time_entires){
+					update_time_entry_by_id(saved_te.id, saved_te)
 				}
 			// }
 
-			update_time_entry_by_id(te.id, modified_te)
 		}
 
 	})

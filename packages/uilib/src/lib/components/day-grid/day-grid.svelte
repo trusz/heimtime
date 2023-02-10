@@ -1,6 +1,6 @@
 <script lang="ts">time_entry_to_item
 	import DayGridLayout from "./day-grid-layout.svelte"
-	import { slot_to_minutes, type Time_Entry, time_entry_context_use, use_project_context, type Project, init_project_context, Time_Entry_State, time_entry_execute_action, Time_Entry_Action, date_format_iso, new_time_entry, date_to_slot } from "@heimtime/api"
+	import { slot_to_minutes, type Time_Entry, time_entry_context_use, use_project_context, type Project, init_project_context, Time_Entry_State, time_entry_execute_action, Time_Entry_Action, date_format_iso, new_time_entry, date_to_slot, date_format_time } from "@heimtime/api"
 	import { time_entry_to_item } from "./item"
 	import { Card, context_card_use } from "../card"
   	import { minutes_to_date } from "../../x/date"
@@ -248,19 +248,54 @@
 		console.log({level:"dev", msg:"_handle move done", time_entry, modified_time_entry})
 		update_time_entry_by_id(time_entry.id, modified_time_entry)
 	}
-	
-	
-	
+	function handle_paste(event:ClipboardEvent){
+		if(!is_active_for_pasting){return}
+		const text = event.clipboardData?.getData('text/json');
+		if(!text){ return }
+		let time_entries = JSON.parse(text) as Time_Entry[]
+		time_entries.forEach(te => {
+			const start = new Date(te.start)
+			const end = new Date(te.end)
+			const new_start = new Date( `${date_format_iso(date)} ${date_format_time(start)}` )
+			const new_end = new Date( `${date_format_iso(date)} ${date_format_time(end)}` )
+			te.start = new_start
+			te.end = new_end
+			te = time_entry_execute_action(te, Time_Entry_Action.Form_Finished)
+			create_time_entry_v2({
+				...te,
+				id: undefined,
+			})
+		})	
+	}
+
+	let is_active_for_pasting = false
+	function handle_mouseover(){
+		is_active_for_pasting = true
+	}
+	function handle_mouseout(){
+		is_active_for_pasting = false
+	}
 	
 </script>
 
-<DayGridLayout 
-	no_of_slots={no_of_slots}
-	items={items}
-	show_hours={show_hours}
-	on:createstart={handle_create_start}
-	on:createprogress={handle_create_progress}
-	on:createstop={handle_create_stop}
-	on:resizeprogress={handle_resize_progress}
-	on:resizedone={handle_resize_done}
+<svelte:body 
+	on:paste={handle_paste}
 />
+
+<day-grid 
+	on:mouseover={handle_mouseover}	
+	on:mouseout={handle_mouseout}	
+	on:focus
+	on:blur
+>
+	<DayGridLayout 
+		no_of_slots={no_of_slots}
+		items={items}
+		show_hours={show_hours}
+		on:createstart={handle_create_start}
+		on:createprogress={handle_create_progress}
+		on:createstop={handle_create_stop}
+		on:resizeprogress={handle_resize_progress}
+		on:resizedone={handle_resize_done}
+	/>
+</day-grid>

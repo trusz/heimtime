@@ -21,15 +21,12 @@
 	$: (function(d: Date){
 		dates = [start_date]
 		for(let di=1; di<NR_DAYs_TO_SHOW; di++){
-
 			const new_date = date_add_days(new Date(start_date.getTime()),di)
 			dates.push(new_date)
 		}
-
-		console.log(dates)
 	}(start_date))
-	const card_context = context_card_use()
 
+	const card_context = context_card_use()
 	const { 
 		update_time_entry_by_id,
 		store_time_entry,
@@ -46,7 +43,7 @@
 	}
 
 
-	function handle_keydown(event: KeyboardEvent){
+	function handle_backspace(event: KeyboardEvent){
 		const has_all_keys = event.key === "Backspace" && event.metaKey
 		if(!has_all_keys){
 			return
@@ -56,9 +53,30 @@
 			delete_card_by_id(id)
 		}
 	}
+
+
+	function handle_copy(event:ClipboardEvent){
+		const selected_card_ids = card_context.get_selected_card_ids()
+		if(selected_card_ids.length === 0){ return }
+		
+		const time_entries: Time_Entry[] = []
+		for(const id of selected_card_ids){
+			const te = $store_time_entry.find(te => te.id === id)
+			if(!te){ continue }
+
+			time_entries.push(te)
+		}
+
+		event.clipboardData?.setData('text/json', JSON.stringify(time_entries));
+    	event.preventDefault();
+	}
+
 </script>
 
-<svelte:body on:keydown={handle_keydown} />
+<svelte:body 
+	on:keydown={handle_backspace}
+	on:copy={handle_copy}
+/>
 
 <week-grid>
 

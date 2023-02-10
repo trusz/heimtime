@@ -59,6 +59,7 @@ class Card_Context {
 		}
 		this.store.set(cards)
 	}
+
 	public get_selected_card_ids(): number[] {
 		const ids: number[] = []
 		const cards = get(this.store)
@@ -70,6 +71,8 @@ class Card_Context {
 
 		return ids;
 	}
+
+
 
 	// 
 	// Form Popup
