@@ -1,11 +1,11 @@
 <script lang="ts">time_entry_to_item
 	import DayGridLayout from "./day-grid-layout.svelte"
-	import { slot_to_minutes, type Time_Entry, time_entry_context_use, use_project_context, type Project, init_project_context, Time_Entry_State, time_entry_execute_action, Time_Entry_Action, date_format_iso, new_time_entry } from "@heimtime/api"
+	import { slot_to_minutes, type Time_Entry, time_entry_context_use, use_project_context, type Project, init_project_context, Time_Entry_State, time_entry_execute_action, Time_Entry_Action, date_format_iso, new_time_entry, date_to_slot } from "@heimtime/api"
 	import { time_entry_to_item } from "./item"
 	import { Card, context_card_use } from "../card"
   	import { minutes_to_date } from "../../x/date"
   	import type { Event_Save } from "$lib/components/event_form/events";
-  	import type { Event_Detail_Delete } from "$lib/components/card/card_events";
+  	import type { Event_Detail_Delete, Event_Detail_Move } from "$lib/components/card/card_events";
 	
 	// 
 	// Input Props
@@ -56,6 +56,9 @@
 				Card,
 				(event:CustomEvent<Event_Save>) => handle_save(tei, event),
 				handle_delete,
+				(event: CustomEvent) => handle_move_start(te),
+				(event: CustomEvent<Event_Detail_Move>) => handle_move(te, event),
+				(event: CustomEvent) => handle_move_done(te),
 			)
 	)
 
@@ -179,6 +182,71 @@
 		// Note: getting the last time entry could be dangerous later
 		const time_entry = last_time_entry()
 		card_context.open_form(time_entry.id)
+	}
+
+
+	let original_start_slot: number
+	let original_end_slot: number
+	function handle_move_start(time_entry: Time_Entry){
+		const current_start_slot = date_to_slot(time_entry.start, start_hour_24, step_in_minutes)
+		const current_end_slot = date_to_slot(time_entry.end, start_hour_24, step_in_minutes)
+
+		original_start_slot = current_start_slot
+		original_end_slot = current_end_slot
+	}
+
+	let moved = false
+	let current_slot_diff:number
+	function handle_move(time_entry:Time_Entry, e: CustomEvent<Event_Detail_Move>){
+		const slot_diff = e.detail.slot_diff
+		if(slot_diff===0){ return }
+		if(current_slot_diff === slot_diff){ return }
+
+		moved = true
+
+		current_slot_diff = slot_diff
+
+		console.log({level:"dev", msg:"handle move", slot_diff})
+
+		// const current_start_slot = date_to_slot(time_entry.start, start_hour_24, step_in_minutes)
+		// const current_end_slot = date_to_slot(time_entry.end, start_hour_24, step_in_minutes)
+		
+		const new_start_slot = original_start_slot + slot_diff
+		const new_end_slot = original_end_slot + slot_diff
+
+		let new_start_minutes = slot_to_minutes(new_start_slot + 1, start_hour_24, step_in_minutes)
+		let new_end_minutes = slot_to_minutes(new_end_slot + 1, start_hour_24, step_in_minutes)
+		
+		let new_start_date = minutes_to_date(new_start_minutes, date)
+		let new_end_date = minutes_to_date(new_end_minutes, date)
+	
+		const modified_time_entry = time_entry_execute_action(time_entry,Time_Entry_Action.Form_Or_Time_Changes)
+		modified_time_entry.start = new_start_date
+		modified_time_entry.end = new_end_date
+		console.log({
+			level:"dev", 
+			msg:"handle_move", 
+			original_start_slot,
+			original_end_slot,
+			new_start_slot,
+			new_end_slot,
+			new_start_minutes,
+			new_end_minutes,
+			new_start_date,
+			new_end_date,
+			slot_diff,
+			new_time_entry: modified_time_entry,
+		})
+		update_time_entry_by_id(time_entry.id, modified_time_entry)
+	}
+
+	function handle_move_done(time_entry:Time_Entry){
+		if(!moved){ return }
+		moved = false
+		current_slot_diff = 0
+		const modified_time_entry = time_entry_execute_action(time_entry, Time_Entry_Action.Form_Finished)
+		console.log({level:"dev", msg:"_handle move done", time_entry, modified_time_entry})
+		update_time_entry_by_id(time_entry.id, modified_time_entry)
 	}
 	
 	

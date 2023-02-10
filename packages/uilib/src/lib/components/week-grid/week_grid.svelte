@@ -19,6 +19,7 @@
 	// 
 	let dates: Date[] = [start_date]
 	$: (function(d: Date){
+		dates = [start_date]
 		for(let di=1; di<NR_DAYs_TO_SHOW; di++){
 
 			const new_date = date_add_days(new Date(start_date.getTime()),di)
