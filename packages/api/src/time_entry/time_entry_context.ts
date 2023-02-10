@@ -86,8 +86,10 @@ function update_time_entry(index:number, time_entry:Time_Entry){
 	const time_entries_except_current = [...time_entries]
 	time_entries_except_current.splice(index,1)
 
-	const overlapping_time_entries = find_overlapping_time_entries(time_entry, time_entries_except_current)
-
+	// const overlapping_time_entries = find_overlapping_time_entries(time_entry, time_entries_except_current)
+	if( time_entry.start > time_entry.end ){
+		[time_entry.end, time_entry.start] = [time_entry.start, time_entry.end]
+	}
 
 	time_entries[index] = {...time_entry}
 	store_time_entry.set(time_entries)

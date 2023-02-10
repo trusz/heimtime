@@ -14,6 +14,9 @@ export class Time_Entry_API {
 	}
 	private api_url:string
 
+	// 
+	// Fetching
+	// 
 	public async fetch_time_entries(from: Date, to: Date): Promise<Time_Entry[]>{
 		const url = this.url_tracked_times(from, to)
 		const resp = await this.http.get<Response_Tracked_Times>(url)
@@ -30,6 +33,9 @@ export class Time_Entry_API {
 	}
 
 
+	// 
+	// Saving / Creating
+	// 
 	public async save_time_entry(time_entry:Time_Entry): Promise<void>{
 		const url = this.url_post_tracked_times()
 		const payload = time_entry_to_post_tracked_times(time_entry, this.employee_id)
@@ -42,6 +48,25 @@ export class Time_Entry_API {
 		return url.toString()
 	}
 
+	// 
+	// Updating
+	// 
+	public async update_time_entry(time_entry: Time_Entry): Promise<void>{
+		const url = this.url_update_tracked_times(time_entry.id)
+		// Should we creat its own mapper?
+		const payload = time_entry_to_put_tracked_times(time_entry)
+		await this.http.put(url, payload)
+	}
+
+	private url_update_tracked_times(id: number): string{
+		const path = ["trackedtimes", id].join("/")
+		const url = new URL(path, this.base_url)
+		return url.toString()
+	}
+
+	// 
+	// Deleting
+	// 
 	public async delete_time_entry(time_entry: Time_Entry): Promise<void>{
 		const url = this.url_delete_tracked_times(time_entry.id)		
 		await this.http.delete(url)
@@ -116,6 +141,28 @@ function time_entry_to_post_tracked_times(time_entry: Time_Entry, employee_id: n
 	return {
 		date: date_format_iso(time_entry.start),
 		employee:{id:employee_id},
+		trackedTimes:[{
+				start: date_format_time(time_entry.start),
+				end: date_format_time(time_entry.end),
+				note: time_entry.description ?? "",
+				task: {id: time_entry.task?.id!}
+		}],
+	}
+}
+
+type Put_Tracked_Times = {
+	date: Date_ISO,
+	trackedTimes: {
+		start: Time_String,
+		end:   Time_String,
+		note:  string,
+		task:  { id:number }
+	}[]
+}
+
+function time_entry_to_put_tracked_times(time_entry: Time_Entry): Put_Tracked_Times{
+	return {
+		date: date_format_iso(time_entry.start),
 		trackedTimes:[{
 				start: date_format_time(time_entry.start),
 				end: date_format_time(time_entry.end),

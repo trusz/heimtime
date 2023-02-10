@@ -27,6 +27,7 @@ export class API {
 	public fetch_projects = (d: Date = new Date()) => this.project_api.fetch_projects(d)
 	public fetch_time_entires = (f: Date, t:Date) => this.time_entry_api.fetch_time_entries(f,t)
 	public save_time_entry = (te: Time_Entry) => this.time_entry_api.save_time_entry(te)
+	public update_time_entry = (te: Time_Entry) => this.time_entry_api.update_time_entry(te)
 	public delete_time_entry = (te: Time_Entry) => this.time_entry_api.delete_time_entry(te)
 	public fetch_employee = (id: number) => this.employee_api.fetch_employee(id)
 

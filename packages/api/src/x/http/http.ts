@@ -17,6 +17,10 @@ export class HTTP {
     public async post<T>(url: string, payload?: unknown): Promise<JSON_Response<T>> {
         return this.fetch<T>("POST", url, payload)
     }
+    
+    public async put<T>(url: string, payload?: unknown): Promise<JSON_Response<T>> {
+        return this.fetch<T>("PUT", url, payload)
+    }
 
     
     private Auth_Header(): string  {

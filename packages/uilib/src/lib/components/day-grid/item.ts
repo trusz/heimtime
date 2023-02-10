@@ -10,7 +10,7 @@ export type Item = {
 }
 
 export type SvelteComp 	   = new (...a: any[]) => any
-export type ComponentProps = {[key: string]: unknown}
+export type ComponentProps = {id:number} & {[key: string]: unknown}
 
 export function time_entry_to_item(
 	time_entry:		 Time_Entry, 

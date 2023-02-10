@@ -166,6 +166,7 @@
 		}
 
 		const new_time_entry = time_entry_execute_action(time_entry, Time_Entry_Action.Form_Finished)
+		console.log({level:"dev", msg:"handle_resize_done", new_time_entry})
 		update_time_entry_by_id(id, new_time_entry)
 	}
 
