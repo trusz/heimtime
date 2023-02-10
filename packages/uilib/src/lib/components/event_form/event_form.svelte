@@ -23,7 +23,7 @@
 	let anchor: HTMLElement 
 	$: projects = $store_projects
 
-	let new_selected_task: Task | undefined
+	let new_selected_task: Task | undefined = selected_task
 	let new_description = description
 
 	// 
@@ -32,7 +32,6 @@
 	function handle_task_change(e: Event){
 		const target = e.target as HTMLSelectElement
 		const task_id = target.value
-		console.log({level:"dev", msg:"handle_task_change", task_id})
 
 		for(const p of projects){
 			const t = p.tasks.find( t => String(t.id) === task_id)
@@ -49,7 +48,6 @@
 			task: new_selected_task,
 			description: new_description,
 		}
-		console.log({level:"dev", msg:"submiting", detail})
 		dispatch("save", detail)
 	}
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Example } from "$lib/components/internal/example"
-  	import { Time_Entry_State, use_project_context, init_project_context, new_project, new_task, new_time_entry} from "@heimtime/api";
+  	import { Time_Entry_State, use_project_context, init_project_context, new_project, new_task, new_time_entry2} from "@heimtime/api";
 	import Card from "./card.svelte"
 	import { context_card_init } from "./card_context"
 
@@ -13,9 +13,9 @@
 	add_project(
 		new_project(
 			0,
-			"first",
+			"a project with a long name",
 			[
-				new_task(0, "1.1"),
+				new_task(0, "1.1 and a similarly long task name"),
 				new_task(1, "1.2"),
 				new_task(2, "1.3"),
 			]
@@ -40,13 +40,15 @@
 
 	let date_start = new Date("2000-01-01 13:30")
 	let date_end = new Date("2000-01-01 14:15")
-	$: time_entry = new_time_entry(
-		undefined,
-		date_start,
-		date_end,
-		state,
-		$store_projects[0],
-		$store_projects[0].tasks[0],
+	$: time_entry = new_time_entry2(
+		{
+			start: date_start,
+			end: date_end,
+			state,
+			project: $store_projects[0],
+			task: $store_projects[0].tasks[0],
+			description: "a maybe even longer description of a task"
+		}
 	)
 	$: project = $store_projects[0]
 	$: task = project.tasks[0]

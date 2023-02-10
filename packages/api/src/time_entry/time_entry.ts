@@ -131,7 +131,7 @@ const state_machine: State_Machine = {
 	[Time_Entry_State.Stable]: {
 		[Time_Entry_Action.Form_Finished]:        Time_Entry_State.Saving,
 		[Time_Entry_Action.Delete]: 	          Time_Entry_State.Deleting,
-		[Time_Entry_Action.Form_Or_Time_Changes]: Time_Entry_State.In_Progress,
+		[Time_Entry_Action.Form_Or_Time_Changes]: Time_Entry_State.Saving,
 	},
 	[Time_Entry_State.Error]: {
 		[Time_Entry_Action.Form_Or_Time_Changes]: Time_Entry_State.In_Progress,
