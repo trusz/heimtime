@@ -34,23 +34,10 @@ export function date_first_day_of_week(date:Date , first_day_of_week_index = 1):
 
 function date_last_day_of_week(date:Date , first_day_of_week_index: number): Date {
 
-    let last_day_of_week_index = first_day_of_week_index - 1
-    if(last_day_of_week_index < 0){ last_day_of_week_index = 6}
+    const first_day_of_week = date_first_day_of_week(date, first_day_of_week_index)
+    const last_day_of_week = date_add_days(first_day_of_week,6)
 
-    const day_of_week = date.getDay()
-    const las_day_of_week = new Date(date)
-    const diff = last_day_of_week_index >= day_of_week ?
-        last_day_of_week_index - day_of_week :
-        last_day_of_week_index - 6
-
-    // const diff = day_of_week >= last_day_of_week_index ?
-    //         last_day_of_week_index - day_of_week:
-    //         last_day_of_week_index - 6
-
-    las_day_of_week.setDate(date.getDate() - diff)
-    las_day_of_week.setHours(0,0,0,0)
-
-    return las_day_of_week
+    return last_day_of_week
 }
 
 export function date_is_today(d: Date): boolean {

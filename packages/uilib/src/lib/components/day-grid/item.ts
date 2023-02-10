@@ -1,4 +1,4 @@
-import type { Event_Detail_Delete } from "$lib/components/card/card_events";
+import type { Event_Detail_Delete, Event_Detail_Move } from "$lib/components/card/card_events";
 import type { Event_Save } from "$lib/components/event_form/events";
 import { type Time_Entry, date_to_slot, type Project, type Task } from "@heimtime/api"
 
@@ -19,6 +19,9 @@ export function time_entry_to_item(
 	comp: 			 SvelteComp,
 	on_save: 		 (event: CustomEvent<Event_Save>) => void,
 	on_delete: 		 (event: CustomEvent<Event_Detail_Delete>) => void,
+	on_move_start: 	 (event: CustomEvent) => void,
+	on_move: 		 (event: CustomEvent<Event_Detail_Move>) => void,
+	on_move_done:    (event: CustomEvent) => void,
 ): Item {
 
 
@@ -40,6 +43,9 @@ export function time_entry_to_item(
 			time_entry:  time_entry,
 			onsave: 	 on_save,
 			ondelete:    on_delete,
+			onmove:		 on_move,
+			onmovedone:  on_move_done,
+			onmovestart: on_move_start,
 		},
 	}
 

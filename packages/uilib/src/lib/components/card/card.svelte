@@ -101,13 +101,53 @@
 		`--border-color-select:${border_color_select}`,
 	].join("; ")
 
+	const rem_in_px = 16
+	let dragging = false
+	let start_position: {x:number, y:number}
+	let current_position: {x:number, y:number}
+	function handle_drag_start(event: MouseEvent){
+		dragging=true
+		start_position = {
+			x: event.screenX,
+			y: event.screenY,
+		}
+		// console.log({level:"dev", msg:"drag start", event})
+		dispatch("movestart")
+	}
+	function handle_drag(event: MouseEvent){
+		if(!dragging){	return }
+		if(event.screenY === 0){ return }
+		
+		current_position = {
+			x: event.screenX,
+			y: event.screenY,
+		}
+		const diff = {
+			x: current_position.x - start_position.x,
+			y: current_position.y - start_position.y,
+		}
+		const grid_y = Math.floor(diff.y / rem_in_px)
+		dispatch("move", {slot_diff:grid_y})
+	}
+	function handle_drag_end(event: Event){
+		if(!dragging){ return }
+		dragging=false
+		// console.log({level:"dev", msg:"drag end", event})
+		dispatch("movedone")
+	}
+
 </script>
 
 <card 
+
+	draggable="false"
+	on:mousedown={handle_drag_start}
+
 	on:click={handle_click}
 	on:dblclick={handle_dbclick}
 	on:keypress 
 	bind:this={anchor} 
+	class:dragging
 	class:selected
 	class:stable      = {time_entry.state === Time_Entry_State.Stable}
 	class:in-progress = {time_entry.state === Time_Entry_State.In_Progress}
@@ -136,6 +176,10 @@
 	/>
 </Popup>
 
+<svelte:body
+	on:mousemove={handle_drag}
+	on:mouseup={handle_drag_end}
+/>
 
 <style>
 	card{
@@ -146,18 +190,24 @@
 		height:  	      100%;
 		border-radius:    var(--border-radius);
 		background-color: var(--bg-color, #ffffff18);
-		backdrop-filter:  blur(3px);
+		
+		backdrop-filter:  		 blur(3px);
 		-webkit-backdrop-filter: blur(3px);
 
 		padding: 0.3rem 0.5rem;
 		margin:  0 0.2rem;
-		grid-template-columns: 1fr auto;
+		grid-template-columns: auto auto 1fr;
 		grid-auto-rows: min-content;
 		overflow: hidden;
 
 		user-select: none;
 
 		transition: opacity 100ms;
+	}
+
+	card.dragging{
+		/* opacity: 0.9; */
+		cursor:grabbing;
 	}
 
 	card.in-progress{
@@ -225,11 +275,13 @@
 		}
 	}
 
+	
 	.time-span{
-		grid-column-start: 1;
+		grid-area: 1 / 1 / 4 / 2;
+		/* grid-column-start: 1;
 		grid-column-end: 2;
 		grid-row-start: 1;
-		grid-row-end: 4;
+		grid-row-end: 4; */
 	}
 
 	

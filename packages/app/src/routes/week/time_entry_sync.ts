@@ -50,7 +50,6 @@ export function time_entry_sync(api:API, ){
 	})
 
 	store_time_entry_to_delete.subscribe(async (time_entries_to_delete: Time_Entry[])=>{
-		console.log({level:"dev", msg:"deleting", length: time_entries_to_delete.length, time_entries_to_delete})
 		for(const te of time_entries_to_delete){
 			const is_on_server = te.id > 0
 			if( is_on_server ){

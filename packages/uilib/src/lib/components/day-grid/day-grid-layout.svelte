@@ -90,6 +90,7 @@
 			on:mousedown={() => handle_mouse_down(si)}
 			on:mouseup={() => handle_mouse_up(si)}
 			on:mouseover={() => handle_mouse_over(si)}
+
 		>
 			&nbsp;
 		</div>
@@ -114,6 +115,9 @@
 				{...item.props} 
 				on:save={item.props.onsave} 
 				on:delete={item.props.ondelete} 
+				on:move={item.props.onmove}
+				on:movedone={item.props.onmovedone}
+				on:movestart={item.props.onmovestart}
 			/>
 			<div 
 				class="resizer" 
