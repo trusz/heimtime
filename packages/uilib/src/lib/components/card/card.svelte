@@ -1,5 +1,5 @@
 <script lang="ts">
-	/*
+/*
 	Layout:
 	┌────────────────────────────────────────┐
 	│13:00 - 14:00                       WESP│
@@ -7,7 +7,7 @@
 	│                Onboarding Documentation│
 	│                                        │
 	└────────────────────────────────────────┘
-	*/
+*/
 
 	import { createEventDispatcher } from "svelte"
 	import { Time_Entry_State, date_format_time, type Time_Entry } from "@heimtime/api";
@@ -28,11 +28,15 @@
 
 
 	const transparency_hex_default = "40"
+	const transparency_hex_border = "60"
 	const transparency_hex_select = "60"
+	const transparency_hex_border_select = "80"
 	let color = "#ffffff18"
-	$: color = string_to_color(time_entry.project?.name??"")
+	$: color = string_to_color( time_entry.project?.name??"" )
 	$: bg_color = color + transparency_hex_default
 	$: bg_color_select = color + transparency_hex_select
+	$: border_color = color + transparency_hex_border
+	$: border_color_select = color + transparency_hex_border_select
 	// 
 	// Config
 	// 
@@ -89,6 +93,13 @@
 	$: task_name = time_entry.task?.name ?? ""
 	$: description = time_entry.description ?? ""
 
+	$: style = [
+		`--bg-color:${bg_color}`,
+		`--bg-color-select:${bg_color_select}`,
+		`--border-color:${border_color}`,
+		`--border-color-select:${border_color_select}`,
+	].join("; ")
+
 </script>
 
 <card 
@@ -103,7 +114,7 @@
 	class:error		  = {time_entry.state === Time_Entry_State.Error}
 	class:deleting	  = {time_entry.state === Time_Entry_State.Deleting}
 
-	style={`--bg-color:${bg_color}; --bg-color-select:${bg_color_select}`}
+	style={style}
 
 >
 	<div class="time-span">{format_time_span(date_start, date_end)}</div>
@@ -127,9 +138,9 @@
 <style>
 	card{
 
-		border:  	      rgba(255,255,255,0.1) solid thin;
+		border:  	      var(--border-color, rgba(255,255,255,0.1)) solid thin;
 		display: 	      grid;
-		gap: 			  0px;
+		gap: 			  0.75rem;
 		height:  	      100%;
 		border-radius:    var(--border-radius);
 		background-color: var(--bg-color, #ffffff18);
@@ -138,7 +149,7 @@
 		padding: 0.3rem 0.5rem;
 		margin:  0 1rem;
 		grid-template-columns: 1fr auto;
-		grid-auto-rows: 1rem;
+		grid-auto-rows: min-content;
 		overflow: hidden;
 
 		user-select: none;
@@ -175,26 +186,34 @@
 	}
 
 	card.selected {
+		border:  	      var(--border-color_select, rgba(255,255,255,0.1)) solid thin;
 		background-color: var(--bg-color-select,  rgba(255,255,255,0.3));
 	}
 	
 
 	@keyframes border-dance {
-			0% {
-				background-position: left top, right bottom, left bottom, right top;
-			}
-			100% {
-				background-position: left 15px top, right 15px bottom , left bottom 15px , right   top 15px;
-			}
+		0% {
+			background-position: left top, right bottom, left bottom, right top;
 		}
-
-	.project{
-		justify-self: end;
+		100% {
+			background-position: left 15px top, right 15px bottom , left bottom 15px , right   top 15px;
+		}
 	}
+
+	.time-span{
+		grid-column-start: 1;
+		grid-column-end: 2;
+		grid-row-start: 1;
+		grid-row-end: 4;
+	}
+
+	
+	.project,
 	.task,
 	.description{
+		text-align: right;
 		justify-self: end;
-		grid-column-start: 1;
+		grid-column-start: 2;
 		grid-column-end: 3;
 	}
 
