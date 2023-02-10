@@ -147,6 +147,7 @@
 		border-radius:    var(--border-radius);
 		background-color: var(--bg-color, #ffffff18);
 		backdrop-filter:  blur(3px);
+		-webkit-backdrop-filter: blur(3px);
 
 		padding: 0.3rem 0.5rem;
 		margin:  0 0.2rem;
@@ -182,6 +183,16 @@
 		animation: border-dance 0.7s infinite linear;
 	
 	}
+
+	card.error{
+		--dash-color: var(--color-red-1);
+		background-image: linear-gradient(90deg, var(--dash-color) 50%, transparent 50%), linear-gradient(90deg, var(--dash-color) 50%, transparent 50%), linear-gradient(0deg, var(--dash-color) 50%, transparent 50%), linear-gradient(0deg, var(--dash-color) 50%, transparent 50%);
+		background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+		background-size: 15px 2px, 15px 2px, 2px 15px, 2px 15px;
+		background-position: left top, right bottom, left bottom, right top;
+		animation: border-bounce 0.7s infinite ease;
+		
+	}
 	
 	card.deleting {
 		opacity: 0.5;
@@ -199,6 +210,18 @@
 		}
 		100% {
 			background-position: left 15px top, right 15px bottom , left bottom 15px , right   top 15px;
+		}
+	}
+
+	@keyframes border-bounce {
+		0% {
+			background-position: left top, right bottom, left bottom, right top;
+		}
+		50% {
+			background-position: left 15px top, right 15px bottom , left bottom 15px , right   top 15px;
+		}
+		100% {
+			background-position: left 0 top, right 0 bottom , left bottom 0 , right   top 0;
 		}
 	}
 

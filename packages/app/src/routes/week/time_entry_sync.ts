@@ -1,5 +1,6 @@
 import { 
 	date_format_iso,
+	date_format_time,
 	Time_Entry_Action,
 	time_entry_context_use,
 	time_entry_execute_action,
@@ -20,21 +21,28 @@ export function time_entry_sync(api:API, ){
 
 	store_time_entry_to_save.subscribe(async (time_entries_to_save: Time_Entry[])=>{
 		for(const te of time_entries_to_save){
-			if(te.id < 0 ){
-				await api.save_time_entry(te)
-			}else {
-				await api.update_time_entry(te)
+			try{
+				if(te.id < 0 ){
+					await api.save_time_entry(te)
+				}else {
+					await api.update_time_entry(te)
+				}
+			}catch(err){
+				console.log({level:"error", msg:"could not save time entry", te, err})
+				const errd_te = time_entry_execute_action(te, Time_Entry_Action.Save_Error)
+				update_time_entry_by_id(te.id, errd_te)
+				return
 			}
 			
 			const modified_te = time_entry_execute_action(te, Time_Entry_Action.Save_Success)
 
-			if( te.id < 0){
+			// if( te.id < 0){
 				const saved_time_entires = await api.fetch_time_entires(te.start, te.start)
 				const saved_entry = find_matching_time_entry(te, saved_time_entires)
 				if(saved_entry){
 					modified_te.id = saved_entry.id
 				}
-			}
+			// }
 
 			update_time_entry_by_id(te.id, modified_te)
 		}
@@ -61,8 +69,8 @@ function find_matching_time_entry(local_time_entry: Time_Entry, existing_time_en
 
 function is_same_time_entry_expect_id(t1: Time_Entry, t2: Time_Entry): boolean{
 	let is_same = t1.description === t2.description
-	is_same = is_same && date_format_iso(t1.start) === date_format_iso(t2.start)
-	is_same = is_same && date_format_iso(t1.end) === date_format_iso(t2.end)
+	is_same = is_same && date_format_time(t1.start) === date_format_time(t2.start)
+	is_same = is_same && date_format_time(t1.end) === date_format_time(t2.end)
 	is_same = is_same && t1.task?.id === t2.task?.id
 
 	return is_same

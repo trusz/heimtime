@@ -16,7 +16,7 @@
 	const dispatch 				   = createEventDispatcher()
 	const dispatch_create_start    = (index:number) => dispatch("createstart", index)
 	const dispatch_create_progress = (index:number) => dispatch("createprogress", index)
-	const dispatch_resize 		   = (index:number, id:number) => dispatch("resizeprogress", {index,id})
+	const dispatch_resize 		   = (index:number, id:number, up:boolean) => dispatch("resizeprogress", {index,id,up})
 	const dispatch_resize_done 	   = (id:number) => dispatch("resizedone", id)
 	const dispatch_create_stop     = (index:number) => dispatch("createstop", index)
 	$: slots = new Array(no_of_slots).fill(null,0, no_of_slots)
@@ -32,9 +32,8 @@
 
 	function handle_mouse_over(index:number){
 		if(!creating){ return }
-
 		if(resizing_id !== -1 ){
-			dispatch_resize(index, resizing_id)
+			dispatch_resize(index, resizing_id, resizing_up)
 			return
 		}
 		dispatch_create_progress(index)
@@ -45,6 +44,7 @@
 
 		if(resizing_id !== -1){
 			dispatch_resize_done(resizing_id)
+			resizing_id = -1
 			creating = false
 			return
 		}
@@ -54,8 +54,10 @@
 	}
 
 	let resizing_id = -1
-	function handle_resize_mouse_down(id: number){
+	let resizing_up = false
+	function handle_resize_mouse_down(id: number, up = false){
 		resizing_id = id
+		resizing_up = up
 		console.log({level:"dev", msg:"resizing", id})
 		creating = true
 	}
@@ -99,6 +101,14 @@
 			class:dont-interact={creating}
 			style={`--event-start:${item.start+1}; --event-end:${item.end+1};`}
 		>
+			<div 
+				class="resizer" 
+				on:mousedown={() => handle_resize_mouse_down(item.props.id,true)}
+				on:mouseup={() => handle_resize_mouse_up(item.props.id)}
+			>
+				&nbsp;
+			</div>
+
 			<svelte:component 
 				this={item.component} 
 				{...item.props} 
