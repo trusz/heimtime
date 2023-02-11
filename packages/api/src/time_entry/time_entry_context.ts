@@ -22,8 +22,11 @@ const time_entry_context = {
 	last_time_entry,
 	update_last_time_entry,
 	update_time_entry,
+	update_time_entry_batch,
 	update_time_entry_by_id,
+	update_time_entry_by_id_batch,
 	delete_time_entry,
+	delete_time_entry_batch,
 }
 export type Time_Entry_Context = typeof time_entry_context
 const context_key = {}
@@ -42,13 +45,13 @@ export function time_entry_context_use(){
 
 
 function create_time_entry_v2(
-	time_entry_to_create: Partial<Time_Entry>
+	...time_entries_to_create: Partial<Time_Entry>[]
 ){
 
-	const time_entry = new_time_entry2(time_entry_to_create)
-	
+	const new_time_entries = time_entries_to_create.map( (te) => new_time_entry2(te))
+	// const time_entry = new_time_entry2(time_entries_to_create)
 	const time_entries = get(store_time_entry)
-	store_time_entry.set( [...time_entries, time_entry] )
+	store_time_entry.set( [...time_entries, ...new_time_entries] )
 }
 
 function create_time_entry(
@@ -81,6 +84,27 @@ function update_last_time_entry(time_entry: Time_Entry){
 	update_time_entry(time_entries.length-1, time_entry)
 }
 
+export type CMD_Update_Time_Entry_By_Index = {
+	index: number,
+	time_entry: Time_Entry
+}
+
+function update_time_entry_batch(cmds: CMD_Update_Time_Entry_By_Index[]): void {
+	const time_entries = get(store_time_entry)
+	
+	for( const {index, time_entry} of cmds) {
+		const time_entries_except_current = [...time_entries]
+		time_entries_except_current.splice(index,1)
+
+		if( time_entry.start > time_entry.end ){
+			[time_entry.end, time_entry.start] = [time_entry.start, time_entry.end]
+		}
+		time_entries[index] = {...time_entry}
+	}
+	store_time_entry.set(time_entries)
+}
+
+
 function update_time_entry(index:number, time_entry:Time_Entry){
 	const time_entries = get(store_time_entry)
 	const time_entries_except_current = [...time_entries]
@@ -95,6 +119,23 @@ function update_time_entry(index:number, time_entry:Time_Entry){
 	store_time_entry.set(time_entries)
 }
 
+export type CMD_Update_Time_Entry_By_Id= {
+	id: number,
+	time_entry: Time_Entry
+}
+function update_time_entry_by_id_batch(cmds: CMD_Update_Time_Entry_By_Id[]){
+	const time_entries = get(store_time_entry)
+	const new_cmds: CMD_Update_Time_Entry_By_Index[] = []
+	for(const {id, time_entry} of cmds){
+		const index = time_entries.findIndex(te => te.id === id)
+		new_cmds.push({
+			index,
+			time_entry,
+		})
+	}
+
+	update_time_entry_batch(new_cmds)
+}
 function update_time_entry_by_id(id: number, time_entry: Time_Entry){
 	const time_entries = get(store_time_entry)
 	const index = time_entries.findIndex(te => te.id === id)
@@ -106,6 +147,19 @@ function update_time_entry_by_id(id: number, time_entry: Time_Entry){
 	update_time_entry(index, time_entry)
 }
 
+function delete_time_entry_batch(ids: number[]){
+	const time_entries = [...get(store_time_entry)]
+	for(const id of ids){
+		const index = time_entries.findIndex(te => te.id === id)
+		if(index < 0){
+			console.log({level:"warn", msg:"delete_time_entry: could not find time entry by id, stopping", id })
+			return
+		}
+		time_entries.splice(index,1)
+	}
+	store_time_entry.set(time_entries)
+	
+}
 function delete_time_entry(id: number){
 	const time_entries = [...get(store_time_entry)]
 	const index = time_entries.findIndex(te => te.id === id)

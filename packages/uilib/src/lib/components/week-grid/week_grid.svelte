@@ -1,6 +1,6 @@
 <script lang="ts">
   import { context_card_use } from "$lib/components/card";
-  	import { date_add_days, date_format_date_local, date_format_iso, date_is_today, Time_Entry_Action, time_entry_context_use, time_entry_execute_action, type Project, type Time_Entry } from "@heimtime/api";
+  	import { date_add_days, date_format_date_local, date_format_iso, date_is_today, Time_Entry_Action, time_entry_context_use, time_entry_execute_action, type CMD_Update_Time_Entry_By_Id, type Project, type Time_Entry } from "@heimtime/api";
 	import { DayGrid } from "../day-grid"
 
 	// 
@@ -12,7 +12,7 @@
 	// 
 	// Config
 	// 
-	const NR_DAYs_TO_SHOW = 5
+	const NR_DAYs_TO_SHOW = 6
 
 	// 
 	// Setup
@@ -29,17 +29,30 @@
 	const card_context = context_card_use()
 	const { 
 		update_time_entry_by_id,
+		update_time_entry_by_id_batch,
 		store_time_entry,
 	 } = time_entry_context_use()
 
-	function delete_card_by_id(id: number){
-		const time_entry_to_delete = $store_time_entry.find(te => te.id === id)
-		if(!time_entry_to_delete){
-			console.log({level:"warn", msg:"could not find time entry to delete, stopping", id})
-			return
+
+	function delete_card_by_ids(ids: number[]){
+		if(ids.length === 0 ){ return }
+
+		const cmds: CMD_Update_Time_Entry_By_Id[] = []
+		for(const id of ids){
+			const time_entry_to_delete = $store_time_entry.find(te => te.id === id)
+			if(!time_entry_to_delete){
+				console.log({level:"warn", msg:"could not find time entry to delete, stopping", id})
+				return
+			}
+			const modified_te = time_entry_execute_action(time_entry_to_delete, Time_Entry_Action.Delete)
+			cmds.push({
+				id:id,
+				time_entry: modified_te,
+			})
+
 		}
-		const modified_te = time_entry_execute_action(time_entry_to_delete, Time_Entry_Action.Delete)
-		update_time_entry_by_id(id, modified_te)
+
+		update_time_entry_by_id_batch(cmds)
 	}
 
 
@@ -49,9 +62,7 @@
 			return
 		}
 		const selected_card_ids = card_context.get_selected_card_ids()
-		for(const id of selected_card_ids){
-			delete_card_by_id(id)
-		}
+		delete_card_by_ids(selected_card_ids)
 	}
 
 

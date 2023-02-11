@@ -5,6 +5,8 @@ import {
 	time_entry_context_use,
 	time_entry_execute_action,
 	time_entry_overlap,
+	type CMD_Update_Time_Entry,
+	type CMD_Update_Time_Entry_By_Id,
 	type Time_Entry,
 } from "@heimtime/api"
 import type { API } from "src/api"
@@ -17,11 +19,20 @@ export function time_entry_sync(api:API, ){
 		store_time_entry_to_save,
 		store_time_entry_to_delete,
 		update_time_entry_by_id,
+		update_time_entry_by_id_batch,
 		delete_time_entry,
+		delete_time_entry_batch,
 	} = time_entry_context_use()
 
 	store_time_entry_to_save.subscribe(async (time_entries_to_save: Time_Entry[])=>{
+		if(time_entries_to_save.length === 0) { return }
+
+		console.log({level:"dev", msg:"store_time_entry_to_save", time_entries_to_save})
+		const update_cmds: CMD_Update_Time_Entry_By_Id[] = []
 		for(const te of time_entries_to_save){
+			// 
+			// Try to save
+			// 
 			try{
 				if(te.id < 0 ){
 					await api.save_time_entry(te)
@@ -32,36 +43,60 @@ export function time_entry_sync(api:API, ){
 				console.log({level:"error", msg:"could not save time entry", te, err})
 				const errd_te = time_entry_execute_action(te, Time_Entry_Action.Save_Error)
 				update_time_entry_by_id(te.id, errd_te)
-				return
+				update_cmds.push({
+					id: te.id,
+					time_entry: errd_te
+				})
+				continue
 			}
 			
+			 
+			// 
+			// Update form server
+			// 
+			const saved_time_entires = await api.fetch_time_entires(te.start, te.start)
+			
+			
+			// 
+			// Local Sync
+			//
 			const modified_te = time_entry_execute_action(te, Time_Entry_Action.Save_Success)
+			const saved_entry = find_matching_time_entry(te, saved_time_entires)
+			if(saved_entry){
+				modified_te.id = saved_entry.id
+				update_cmds.push({
+					id: te.id,
+					time_entry: modified_te
+				})
+				// update_time_entry_by_id(te.id, modified_te)
+			}
 
-			// if( te.id < 0){
-				const saved_time_entires = await api.fetch_time_entires(te.start, te.start)
-				const saved_entry = find_matching_time_entry(te, saved_time_entires)
-				if(saved_entry){
-					modified_te.id = saved_entry.id
-					update_time_entry_by_id(te.id, modified_te)
-				}
+			for(const saved_te of saved_time_entires){
+				update_cmds.push({
+					id:saved_te.id,
+					time_entry: saved_te
+				})
+				// update_time_entry_by_id(saved_te.id, saved_te)
+			}
 
-				for(const saved_te of saved_time_entires){
-					update_time_entry_by_id(saved_te.id, saved_te)
-				}
-			// }
+		} // for
 
-		}
-
+		update_time_entry_by_id_batch(update_cmds)
 	})
 
 	store_time_entry_to_delete.subscribe(async (time_entries_to_delete: Time_Entry[])=>{
+		console.log({level:"dev", msg:"TEs to delete", time_entries_to_delete})
+		if(time_entries_to_delete.length === 0){ return }
+
+		const deleted_ids: number[] = []
 		for(const te of time_entries_to_delete){
 			const is_on_server = te.id > 0
 			if( is_on_server ){
 				await api.delete_time_entry(te)
 			}
-			delete_time_entry(te.id)
+			deleted_ids.push(te.id)
 		}
+		delete_time_entry_batch(deleted_ids)
 	})
 }
 
