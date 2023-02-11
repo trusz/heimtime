@@ -27,39 +27,41 @@ export function time_entry_sync(api:API, ){
 	store_time_entry_to_save.subscribe(async (time_entries_to_save: Time_Entry[])=>{
 		if(time_entries_to_save.length === 0) { return }
 
-		console.log({level:"dev", msg:"store_time_entry_to_save", time_entries_to_save})
 		const update_cmds: CMD_Update_Time_Entry_By_Id[] = []
-		for(const te of time_entries_to_save){
-			// 
-			// Try to save
-			// 
-			try{
-				if(te.id < 0 ){
-					await api.save_time_entry(te)
-				}else {
-					await api.update_time_entry(te)
-				}
-			}catch(err){
-				console.log({level:"error", msg:"could not save time entry", te, err})
+
+
+		// 
+		// Trying to save
+		// 
+		const update_promises = time_entries_to_save.map( (te) => {
+			if(te.id < 0 ){
+				return api.save_time_entry(te)
+			}else {
+				return api.update_time_entry(te)
+			}
+		})
+
+		const results = await Promise.allSettled(update_promises)
+		results.forEach( (result, ri) => {
+			const te = time_entries_to_save[ri]
+
+			if(result.status === "rejected"){
+				console.log({level:"error", msg:"could not save time entry", te, err: result})
 				const errd_te = time_entry_execute_action(te, Time_Entry_Action.Save_Error)
-				update_time_entry_by_id(te.id, errd_te)
 				update_cmds.push({
 					id: te.id,
 					time_entry: errd_te
 				})
-				continue
 			}
-			
-			 
-			// 
-			// Update form server
-			// 
-			const saved_time_entires = await api.fetch_time_entires(te.start, te.start)
-			
-			
-			// 
-			// Local Sync
-			//
+		})
+
+		// 
+		// Updat Saved Entries From server
+		// 
+		const {start,end} = find_biggest_date_range(time_entries_to_save)
+		const saved_time_entires = await api.fetch_time_entires(start,end)
+
+		for(const te of time_entries_to_save){
 			const modified_te = time_entry_execute_action(te, Time_Entry_Action.Save_Success)
 			const saved_entry = find_matching_time_entry(te, saved_time_entires)
 			if(saved_entry){
@@ -67,36 +69,56 @@ export function time_entry_sync(api:API, ){
 				update_cmds.push({
 					id: te.id,
 					time_entry: modified_te
-				})
-				// update_time_entry_by_id(te.id, modified_te)
+				})	
 			}
+		}
 
-			for(const saved_te of saved_time_entires){
-				update_cmds.push({
-					id:saved_te.id,
-					time_entry: saved_te
-				})
-				// update_time_entry_by_id(saved_te.id, saved_te)
-			}
-
-		} // for
+		// 
+		// Update rest of entires
+		// 
+		for(const saved_te of saved_time_entires){
+			update_cmds.push({
+				id:saved_te.id,
+				time_entry: saved_te
+			})
+		}
 
 		update_time_entry_by_id_batch(update_cmds)
+
 	})
 
 	store_time_entry_to_delete.subscribe(async (time_entries_to_delete: Time_Entry[])=>{
 		console.log({level:"dev", msg:"TEs to delete", time_entries_to_delete})
 		if(time_entries_to_delete.length === 0){ return }
 
-		const deleted_ids: number[] = []
-		for(const te of time_entries_to_delete){
+
+		const update_cmds: CMD_Update_Time_Entry_By_Id[] = []
+		const delete_promises = time_entries_to_delete.map((te)=>{
 			const is_on_server = te.id > 0
 			if( is_on_server ){
-				await api.delete_time_entry(te)
+				return api.delete_time_entry(te)
 			}
-			deleted_ids.push(te.id)
-		}
+		})
+		const deleted_ids: number[] = []
+		const results = await Promise.allSettled(delete_promises)
+		results.forEach( (result, ri) => {
+			const te = time_entries_to_delete[ri]
+
+			if(result.status === "rejected"){
+				console.log({level:"error", msg:"could not delete time entry", te, err: result})
+				const errd_te = time_entry_execute_action(te, Time_Entry_Action.Save_Error)
+				update_cmds.push({
+					id: te.id,
+					time_entry: errd_te
+				})
+			}else{
+				deleted_ids.push(te.id)
+			}
+		})
+
 		delete_time_entry_batch(deleted_ids)
+		update_time_entry_by_id_batch(update_cmds)
+
 	})
 }
 
@@ -113,4 +135,28 @@ function is_same_time_entry_expect_id(t1: Time_Entry, t2: Time_Entry): boolean{
 	is_same = is_same && t1.task?.id === t2.task?.id
 
 	return is_same
+}
+
+function find_biggest_date_range(time_entries: Time_Entry[]): {start:Date, end:Date} {
+	if(time_entries.length === 0){
+		throw new Error("we need time entires")
+	}
+
+	let min_start = time_entries[0].start
+	let max_end = time_entries[0].end
+
+	for(const te of time_entries){
+		if( date_format_iso(te.start) < date_format_iso(min_start) ){
+			min_start = te.start
+		}
+
+		if( date_format_iso(te.end) > date_format_iso(max_end) ){
+			max_end = te.end
+		}
+	}
+
+	return {
+		start: min_start,
+		end: max_end,
+	}
 }
