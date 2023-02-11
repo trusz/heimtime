@@ -253,7 +253,7 @@
 		const text = event.clipboardData?.getData('text/json');
 		if(!text){ return }
 		let time_entries = JSON.parse(text) as Time_Entry[]
-		time_entries.forEach(te => {
+		const time_entries_to_create: Partial<Time_Entry>[] = time_entries.map(te => {
 			const start = new Date(te.start)
 			const end = new Date(te.end)
 			const new_start = new Date( `${date_format_iso(date)} ${date_format_time(start)}` )
@@ -261,11 +261,12 @@
 			te.start = new_start
 			te.end = new_end
 			te = time_entry_execute_action(te, Time_Entry_Action.Form_Finished)
-			create_time_entry_v2({
+			return {
 				...te,
 				id: undefined,
-			})
+			}
 		})	
+		create_time_entry_v2(...time_entries_to_create)
 	}
 
 	let is_active_for_pasting = false
