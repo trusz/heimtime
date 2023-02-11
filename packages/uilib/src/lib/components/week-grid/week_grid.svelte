@@ -12,7 +12,7 @@
 	// 
 	// Config
 	// 
-	const NR_DAYs_TO_SHOW = 6
+	const NR_DAYs_TO_SHOW = 5
 
 	// 
 	// Setup
