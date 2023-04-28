@@ -56,6 +56,11 @@ function projects_from_response(resp: Response_Project): Project[] {
 			}
 			new_project.tasks.push(new_task)
 		}
+		new_project.tasks.sort( (ta,tb) => {
+			if(ta.id > tb.id) { return 1}
+			if(ta.id < tb.id) { return -1}
+			return 0
+		} )
 		projects.push(new_project)
 	}
 	return projects
