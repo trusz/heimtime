@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { Example } from "$lib/components/internal/example"
   	import { Time_Entry_State, use_project_context, init_project_context, new_project, new_task, new_time_entry2} from "@heimtime/api";
 	import Card from "./card.svelte"
 	import { context_card_init } from "./card_context"
+  import { Example } from "../internal";
 
 	// 
 	// Context

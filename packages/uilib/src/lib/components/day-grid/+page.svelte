@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { Example } from "$lib/components/internal/example"
+  import { context_card_init } from "../card";
+  import { Example } from "../internal";
 	import DayGridLayout from "./day-grid-layout.svelte";
 	import DayGrid from "./day-grid.svelte"
 	import { 
@@ -14,7 +15,7 @@
         Time_Entry_State,
         date_add_days,
 	} from "@heimtime/api"
-  	import { context_card_init } from "$lib/components/card/card_context";
+  	
 
 	let no_of_slots = 20
 

@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { Example } from "$lib/components/internal"
     import { date_add_days, date_format_iso, date_week_frames, new_project, new_task, Time_Entry_Action, time_entry_context_init, time_entry_context_use, time_entry_execute_action, Time_Entry_State, type Time_Entry } from "@heimtime/api";
 	import WeekGrid from "./week_grid.svelte"
 	import { context_card_init } from "../card"
+  import { Example } from "../internal";
 
     function handleClick(){
         console.log("clicked")
@@ -82,7 +82,7 @@
 	// API Mocks
 	// 
 	store_time_entry_to_save.subscribe(async (time_entries_to_save: Time_Entry[])=>{
-		console.log({level:"dev", msg:"entries to save", time_entries_to_save})
+		// console.log({level:"dev", msg:"entries to save", time_entries_to_save})
 		await new Promise(r => setTimeout(r, 2_000))
 		for(let te of time_entries_to_save){
 			const modified_te = time_entry_execute_action(te, Time_Entry_Action.Save_Success)

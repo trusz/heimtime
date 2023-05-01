@@ -29,6 +29,6 @@
 	"type": "module",
 	"dependencies": {
 		"@heimtime/api": "workspace:^1.0.0",
-		"@heimtime/uilib": "../uilib/package"
+		"@heimtime/uilib": "workspace:^0.0.1"
 	}
 }

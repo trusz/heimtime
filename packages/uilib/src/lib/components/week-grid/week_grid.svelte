@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { context_card_use } from "$lib/components/card";
   	import { date_add_days, date_format_date_local, date_format_iso, date_is_today, Time_Entry_Action, time_entry_context_use, time_entry_execute_action, type CMD_Update_Time_Entry_By_Id, type Project, type Time_Entry } from "@heimtime/api";
 	import { DayGrid } from "../day-grid"
+  	import { context_card_use } from "../card";
 
 	// 
 	// Input Props

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Example } from "$lib/components/internal"
+    import { Example } from "../internal";
 	import Button from "./button.svelte"
 
     function handleClick(){

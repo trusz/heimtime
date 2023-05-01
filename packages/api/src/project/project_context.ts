@@ -28,6 +28,7 @@ export function use_project_context(){
 	return ctx
 }
 
+// TODO: rewrite with update
 function add_project(...new_projects: Project[]) {
 	const { store_projects } = use_project_context()
 	const projects = get(store_projects)

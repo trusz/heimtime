@@ -39,6 +39,11 @@ export class API {
 		this.time_entry_api.base_url = url
 	}
 
+	public clear_jwt(){
+		this.jwt = ""
+		this.http.jwt = ""
+	}
+
 	public jwt_set(jwt: string){
 		this.jwt = jwt
 		this.http.jwt = this.jwt

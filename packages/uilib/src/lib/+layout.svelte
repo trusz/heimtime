@@ -1,5 +1,5 @@
 <script lang="ts">
-	import "$lib/style.css"
+	import "./style.css"
 	import { page }  from '$app/stores';
 	
 
