@@ -16,15 +16,19 @@ export function string_to_color(str: string): string {
     
     for (let i = 0; i < 3; i++) {
         const value = (hash >> (i * 8)) & 0xFF;
-        const c = value.toString(16)[1].repeat(2)
+        let value_to_repeat = value.toString(16)[1]
+        if(!value_to_repeat === undefined){
+            value_to_repeat = value.toString(16)[0]
+        }
+        const c = value_to_repeat.repeat(2)
         // const c = value.toString(16)
         color_hex += ('00' + c).substr(-2);
     }
     const color_rgb = hex_to_rgb(color_hex)
     const color_hsv = rgb_to_hsv(color_rgb.r, color_rgb.g, color_rgb.b)
-    // color_hsv.h = 0.8
-    color_hsv.s = 0.9
-    color_hsv.v = 0.9
+    color_hsv.h += 0.05
+    color_hsv.s = 0.7
+    color_hsv.v = 0.7
     const color_rgb2 = hsv_to_rgb(color_hsv.h, color_hsv.s, color_hsv.v)
     const color_hex2 = rgb_to_hex(color_rgb2.r, color_rgb2.g, color_rgb2.b)
 

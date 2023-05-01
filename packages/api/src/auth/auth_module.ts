@@ -1,5 +1,6 @@
 import { PublicClientApplication, SilentRequest, AuthenticationResult, Configuration, LogLevel, AccountInfo, InteractionRequiredAuthError, RedirectRequest, PopupRequest, EndSessionRequest, SsoSilentRequest } from "@azure/msal-browser";
 import { msal_config } from "./config"
+import { debug } from "svelte/internal";
 
 /**
  * AuthModule for application - handles authentication in app.
@@ -111,12 +112,20 @@ export class Auth_Module {
         return jwt
     }
 
+    public jwt_clear(){
+        this.clear_JWT_from_local_storage()
+    }
+
     private static jwt_storage_key = "auth_token"
     private save_JWT_to_local_storage(jwt: string){
         localStorage.setItem(Auth_Module.jwt_storage_key, jwt)
     }
     private get_JWT_from_local_storage(): string | null {
         return localStorage.getItem(Auth_Module.jwt_storage_key)
+    }
+
+    private clear_JWT_from_local_storage(){
+        localStorage.removeItem(Auth_Module.jwt_storage_key)
     }
 
     /**

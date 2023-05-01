@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { Example } from "$lib/components/internal"
-	import EventForm from "./event_form.svelte"
-	import { init_project_context, use_project_context, type Project, type Task, new_project, new_task } from "@heimtime/api"
-	import type { Event_Save } from "$lib/components/event_form/events";
+	import { init_project_context, new_project, new_task, use_project_context, type Project, type Task } from "@heimtime/api";
+	import EventForm from "./event_form.svelte";
+	import { Example } from "../internal";
+	import type { Event_Save } from "./events";
 
 	init_project_context()
 	const {store_projects, add_project} = use_project_context()

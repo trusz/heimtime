@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Example } from "$lib/components/internal"
+  import { Example } from "../internal";
 	import Popup from "./popup.svelte"
 
 	let anchor: HTMLElement

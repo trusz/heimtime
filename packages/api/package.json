@@ -2,8 +2,8 @@
   "name": "@heimtime/api",
   "version": "1.0.0",
   "description": "",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "index.ts",
+  "types": "index.ts",
   "scripts": {
     "test": "vitest --root ./src --watch",
     "uilib": "npm run dev",

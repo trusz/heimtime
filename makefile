@@ -8,4 +8,7 @@ dev: install ## Start Heimtime in dev mode
 
 install: ## Install all dependencies
 	pnpm install
+
+uilib: install ## Start uilib
+	pnpm -C packages/uilib uilib
     

@@ -11,12 +11,13 @@
 
 	import { createEventDispatcher } from "svelte"
 	import { Time_Entry_State, date_format_time, type Time_Entry } from "@heimtime/api";
-	import type { Event_Save } from "$lib/components/event_form/events";
-	import type { Event_Detail_Delete } from "$lib/components/card/card_events";
 	import { Popup } from "../popup"
 	import { EventForm } from "../event_form"
 	import { context_card_use } from "./card_context"
-  	import { string_to_color } from "$lib/components/card/color-hash";
+	import { string_to_color } from "./color-hash";
+  	import type { Event_Detail_Delete } from "./card_events";
+	import type { Event_Save } from "../event_form/events";
+
 
 	// 
 	// Input Props

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher, tick } from "svelte"
-	import type { Event_Save } from "$lib/components/event_form/events";
 	import { use_project_context, type Project, type Task } from "@heimtime/api";
+  import type { Event_Save } from "./events";
 
 	// 
 	// Input Props
@@ -9,6 +9,7 @@
 	export let selected_task: Task | undefined
 	export let is_open = false
 	export let description: string | undefined
+	$: console.log({level:"dev", msg:"event form", description})
 
 	// 
 	// Context
@@ -22,7 +23,7 @@
 	let projects: Project[]
 	let anchor: HTMLElement 
 	$: projects = $store_projects
-
+	$: console.log({level:"dev", msg:"event_form", projects, store_projects: $store_projects})
 	let new_selected_task: Task | undefined = selected_task || $store_projects[0].tasks[0]
 	let new_description = description
 
@@ -124,23 +125,23 @@
 	
 
 	form{
-		display: flex;
+		display: 		flex;
 		flex-direction: column;
-		gap:0.5rem;
-		padding: 1rem;
+		gap:			0.5rem;
+		padding: 		1rem;
 	}
 
 	select,
 	textarea {
-		padding:0.2rem 0.3rem;
+		padding:		  0.2rem 0.3rem;
 		background-color: black;
-		color: white;
-		border-radius: var(--border-radius);
+		color: 			  white;
+		border-radius: 	  var(--border-radius);
 	}
 
 	label{
-		display: flex;
+		display: 		flex;
 		flex-direction: column;
-		gap: 0.2rem;
+		gap: 			0.2rem;
 	}
 </style>

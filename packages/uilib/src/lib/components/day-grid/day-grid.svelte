@@ -4,8 +4,8 @@
 	import { time_entry_to_item } from "./item"
 	import { Card, context_card_use } from "../card"
   	import { minutes_to_date } from "../../x/date"
-  	import type { Event_Save } from "$lib/components/event_form/events";
-  	import type { Event_Detail_Delete, Event_Detail_Move } from "$lib/components/card/card_events";
+  import type { Event_Save } from "../event_form/events";
+  import type { Event_Detail_Move, Event_Detail_Delete } from "../card/card_events";
 	
 	// 
 	// Input Props

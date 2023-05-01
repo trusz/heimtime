@@ -5,7 +5,7 @@
 	import { context_api_get, context_api_create } from "../api"
 	import { page }  from '$app/stores';
   	import { Auth_Module } from "@heimtime/api";
-	import "@heimtime/uilib/style.css"
+	import "@heimtime/uilib/src/lib/style.css"
 
 	export const ssr = false;
 	export const prerender = false;
@@ -26,7 +26,6 @@
 	context_api_create()
 	let api = context_api_get()
 	if(jwt && jwt !== ""){
-
 		api.set_base_url(base_url)
 		api.jwt_set(jwt)
 	}
@@ -35,9 +34,10 @@
 		try{
 			await api.fetch_employee(api.employee_id)
 		} catch(err){
-			console.error({level:"dev", msg:"could not fetch employee info", err})
+			console.error({level:"dev", msg:"could not fetch employee info, clearing jwt and reloading", err})
+			auth_module.jwt_clear()
+			api.clear_jwt()
 			if($page.route.id==="/"){ return }
-			api.jwt_set("")
 			goto("/")
 		}
 
