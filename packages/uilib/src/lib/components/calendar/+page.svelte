@@ -1,9 +1,9 @@
 <script lang="ts">
   import { Example } from "../internal";
 	import Calendar from "./calendar.svelte";
-	import { initMocks } from "./mocks";
+	import { init_mocks } from "./mocks";
 
-	initMocks()
+	init_mocks()
 
 </script>
 

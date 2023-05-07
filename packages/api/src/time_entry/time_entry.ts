@@ -9,14 +9,16 @@ export type Time_Entry = {
 	project?:     Project,
 	task?: 	      Task,
 	description?: string
+	is_selected:  boolean,
 }
 
 function time_entry_default(): Time_Entry  {
 	return {
-		id:    	  -1* (Math.random()*10000|0),
-		start: 	  new Date(),
-		end:   	  new Date(),
-		state:    Time_Entry_State.In_Progress,
+		id:    	     -1* (Math.random()*10000|0),
+		start: 	     new Date(),
+		end:   	     new Date(),
+		state:       Time_Entry_State.In_Progress,
+		is_selected: false,
 	}
 } 
 
@@ -27,7 +29,8 @@ export function new_time_entry(
 	state = Time_Entry_State.In_Progress,
 	project?: Project,
 	task?: Task,
-	description?: string
+	description?: string,
+	is_selected = false,
 ): Time_Entry {
 
 	return {
@@ -38,6 +41,7 @@ export function new_time_entry(
 		project,
 		task,
 		description,
+		is_selected,
 	}
 
 }
@@ -99,7 +103,7 @@ export enum Time_Entry_State {
 	Saving 		= "Saving",
 	Error 		= "Error",
 	Stable 		= "Stable",
-	Deleting    = "Deleting"
+	Deleting    = "Deleting",
 }
 
 export enum Time_Entry_Action {

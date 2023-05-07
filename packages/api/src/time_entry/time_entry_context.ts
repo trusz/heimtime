@@ -2,8 +2,11 @@ import { writable, Writable, derived, Readable, get } from "svelte/store"
 import { getContext, setContext } from "svelte"
 import { new_time_entry, new_time_entry2, Time_Entry, time_entry_overlap, Time_Entry_State } from "./time_entry"
 import { Project, Task } from "../project"
+import { Time_Entries } from "./time_entry_store"
 
 
+// Note: does not make sense to have a context but only one store
+// We should create a store when createing the context
 const store_time_entry: Writable<Time_Entry[]> = writable([])
 const store_time_entry_to_save = derived(store_time_entry, (time_entires:Time_Entry[]) => {
 	return time_entires.filter( (e) => e.state === Time_Entry_State.Saving  )
@@ -30,9 +33,22 @@ const time_entry_context = {
 }
 export type Time_Entry_Context = typeof time_entry_context
 const context_key = {}
+const context_key_V2 = {}
 
 export function time_entry_context_init(){
 	setContext<Time_Entry_Context>(context_key, time_entry_context)
+}
+
+export function time_entry_context_init_v2(){
+	setContext<Time_Entries>(context_key_V2, new Time_Entries())
+}
+
+export function time_entry_context_use_v2(){
+	const ctx = getContext<Time_Entries>(context_key_V2)
+	if(!ctx){
+		console.warn({level:"warn", msg:"time entry context has not been initalized"})
+	}
+	return ctx
 }
 
 export function time_entry_context_use(){

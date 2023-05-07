@@ -48,6 +48,19 @@ export function date_is_today(d: Date): boolean {
     return is_today
 }
 
+export function date_duration_in_minutes(start: Date, end: Date): number {
+    const duration_in_minutes = Math.floor((end.getTime() - start.getTime()) / 1000 / 60)
+    return duration_in_minutes
+}
+
+export function date_minutes_to_hours_and_minutes(duration: number): string {
+    const hours = Math.floor(duration / 60)
+    const minutes = duration % 60
+
+    const hours_and_minutes = `${hours}h ${minutes}min`
+    return hours_and_minutes
+}
+
 
 
 // 

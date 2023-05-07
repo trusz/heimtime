@@ -2,39 +2,31 @@ import {
 	date_format_iso,
 	date_format_time,
 	Time_Entry_Action,
-	time_entry_context_use,
 	time_entry_execute_action,
-	time_entry_overlap,
-	type CMD_Update_Time_Entry,
 	type CMD_Update_Time_Entry_By_Id,
 	type Time_Entry,
+	time_entry_context_use_v2,
+	date_first_day_of_week,
 } from "@heimtime/api"
 import type { API } from "src/api"
 
 
 
 export function time_entry_sync(api:API, ){
-	console.log({level:"dev", msg:"time_entry_context_use"})
-	const { 
-		store_time_entry_to_save,
-		store_time_entry_to_delete,
-		update_time_entry_by_id,
-		update_time_entry_by_id_batch,
-		delete_time_entry,
-		delete_time_entry_batch,
-	} = time_entry_context_use()
+	const ctx_time_entries = time_entry_context_use_v2()
 
-	store_time_entry_to_save.subscribe(async (time_entries_to_save: Time_Entry[])=>{
+	ctx_time_entries.store_to_save.subscribe(async (time_entries_to_save: Time_Entry[])=>{
 		if(time_entries_to_save.length === 0) { return }
 
 		const update_cmds: CMD_Update_Time_Entry_By_Id[] = []
-
 
 		// 
 		// Trying to save
 		// 
 		const update_promises = time_entries_to_save.map( (te) => {
-			if(te.id < 0 ){
+			console.log({level:"dev", msg:"saving time entry", te})
+			const not_yet_on_server = te.id < 0
+			if( not_yet_on_server ){
 				return api.save_time_entry(te)
 			}else {
 				return api.update_time_entry(te)
@@ -42,52 +34,59 @@ export function time_entry_sync(api:API, ){
 		})
 
 		const results = await Promise.allSettled(update_promises)
-		results.forEach( (result, ri) => {
-			const te = time_entries_to_save[ri]
+		// results.forEach( (result, ri) => {
+		// 	const te = time_entries_to_save[ri]
 
-			if(result.status === "rejected"){
-				console.log({level:"error", msg:"could not save time entry", te, err: result})
-				const errd_te = time_entry_execute_action(te, Time_Entry_Action.Save_Error)
-				update_cmds.push({
-					id: te.id,
-					time_entry: errd_te
-				})
-			}
-		})
+		// 	if(result.status === "rejected"){
+		// 		console.log({level:"error", msg:"could not save time entry", te, err: result})
+		// 		const errd_te = time_entry_execute_action(te, Time_Entry_Action.Save_Error)
+		// 		update_cmds.push({
+		// 			id: te.id,
+		// 			time_entry: errd_te
+		// 		})
+		// 	}
+		// })
 
 		// 
-		// Updat Saved Entries From server
+		// Update Saved Entries From server
 		// 
-		const {start,end} = find_biggest_date_range(time_entries_to_save)
+		// const {start,end} = find_biggest_date_range(time_entries_to_save)
+		const {start,end} = find_week_range(time_entries_to_save[0].start)
 		const saved_time_entires = await api.fetch_time_entires(start,end)
+		// console.log({level:"dev", msg:"saved time entries", saved_time_entires})
+		// for(const te of time_entries_to_save){
+		// 	const modified_te = time_entry_execute_action(te, Time_Entry_Action.Save_Success)
+		// 	const saved_entry = find_matching_time_entry(te, saved_time_entires)
+		// 	if(saved_entry){
+		// 		console.log({level:"dev", msg:"found matching entry", saved_entry})
+		// 		modified_te.id = saved_entry.id
+		// 		update_cmds.push({
+		// 			id: te.id,
+		// 			time_entry: modified_te
+		// 		})	
+		// 	}
+		// }
 
-		for(const te of time_entries_to_save){
-			const modified_te = time_entry_execute_action(te, Time_Entry_Action.Save_Success)
-			const saved_entry = find_matching_time_entry(te, saved_time_entires)
-			if(saved_entry){
-				modified_te.id = saved_entry.id
-				update_cmds.push({
-					id: te.id,
-					time_entry: modified_te
-				})	
-			}
+		// // 
+		// // Update rest of entires
+		// // 
+		// for(const saved_te of saved_time_entires){
+		// 	update_cmds.push({
+		// 		id:saved_te.id,
+		// 		time_entry: saved_te
+		// 	})
+		// }
+		// ctx_time_entries.update_by_batch(update_cmds)
+		// update_time_entry_by_id_batch(update_cmds)
+		ctx_time_entries.clear()
+		for(const te of saved_time_entires){
+			ctx_time_entries.create_time_entry(te)
 		}
-
-		// 
-		// Update rest of entires
-		// 
-		for(const saved_te of saved_time_entires){
-			update_cmds.push({
-				id:saved_te.id,
-				time_entry: saved_te
-			})
-		}
-
-		update_time_entry_by_id_batch(update_cmds)
 
 	})
 
-	store_time_entry_to_delete.subscribe(async (time_entries_to_delete: Time_Entry[])=>{
+	ctx_time_entries.store_to_delete.subscribe(async (time_entries_to_delete: Time_Entry[])=>{
+	// store_time_entry_to_delete.subscribe(async (time_entries_to_delete: Time_Entry[])=>{
 		if(time_entries_to_delete.length === 0){ return }
 
 
@@ -115,8 +114,10 @@ export function time_entry_sync(api:API, ){
 			}
 		})
 
-		delete_time_entry_batch(deleted_ids)
-		update_time_entry_by_id_batch(update_cmds)
+		ctx_time_entries.update_by_batch(update_cmds)
+		ctx_time_entries.delete_batch(deleted_ids)
+		// delete_time_entry_batch(deleted_ids)
+		// update_time_entry_by_id_batch(update_cmds)
 
 	})
 }
@@ -157,5 +158,20 @@ function find_biggest_date_range(time_entries: Time_Entry[]): {start:Date, end:D
 	return {
 		start: min_start,
 		end: max_end,
+	}
+}
+
+function find_week_range(d: Date): {start:Date, end:Date}{
+	const start = date_first_day_of_week(d,1)
+	const end = new Date(start)
+	end.setDate(end.getDate() + 6)
+	// start.setDate(start.getDate() - start.getDay())
+
+	// const end = new Date(d)
+	// end.setDate(end.getDate() + (6 - end.getDay()))
+
+	return {
+		start,
+		end,
 	}
 }

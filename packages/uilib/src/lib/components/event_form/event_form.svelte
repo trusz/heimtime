@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher, tick } from "svelte"
-	import { use_project_context, type Project, type Task } from "@heimtime/api";
-  import type { Event_Save } from "./events";
+	import type { Project, Task} from "@heimtime/api";
+  	import type { Event_Save } from "./events";
 
 	// 
 	// Input Props
@@ -9,22 +9,24 @@
 	export let selected_task: Task | undefined
 	export let is_open = false
 	export let description: string | undefined
-	$: console.log({level:"dev", msg:"event form", description})
+	export let projects: Project[]
 
 	// 
 	// Context
 	// 
-	const {store_projects} = use_project_context()
+	// const ctx_projects = context_project_use()
+	// const {store_projects} = use_project_context()
 
 	// 
 	// Setup
 	// 
 	const dispatch = createEventDispatcher()
-	let projects: Project[]
+	// let projects: Project[]
 	let anchor: HTMLElement 
-	$: projects = $store_projects
-	$: console.log({level:"dev", msg:"event_form", projects, store_projects: $store_projects})
-	let new_selected_task: Task | undefined = selected_task || $store_projects[0].tasks[0]
+	// const project_sets = ctx_projects.store
+	// $: projects = $project_sets.get(date_format_iso())
+	// $: console.log({level:"dev", msg:"event_form", projects, store_projects: $store_projects})
+	let new_selected_task: Task | undefined = selected_task || projects[0].tasks[0]
 	let new_description = description
 
 	// 

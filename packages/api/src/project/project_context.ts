@@ -2,6 +2,7 @@ import { writable, Writable, derived, Readable, get } from "svelte/store"
 import { getContext, setContext } from "svelte"
 import { Project } from "./project"
 import { Task } from "./task"
+import { Projects } from "./project_store"
 
 
 type Project_Context = {
@@ -38,4 +39,17 @@ function add_project(...new_projects: Project[]) {
 function set_projects(projects: Project[]){
 	const { store_projects } = use_project_context()
 	store_projects.set(projects)
+}
+
+const context_key_v2 = {}
+export function context_project_init(){
+	setContext<Projects>(context_key_v2, new Projects())
+}
+
+export function context_project_use(): Projects{
+	const ctx = getContext<Projects>(context_key_v2)
+	if(!ctx){
+		console.warn({level:"warn", msg:"project context has not been initalized"})
+	}
+	return ctx
 }

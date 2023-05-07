@@ -1,4 +1,25 @@
-body {
-	background: var(--color-black-1);
+
+html, body{
+	height:  100%;
+	margin:  0;
+	padding: 0;
 }
 
+body {
+	background: var(--color-black-1);
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	letter-spacing: 0.1ch;
+}
+
+* {
+	block-size: border-box;
+}
+
+calendar .ec-day.ec-today{
+	background-color: var(--color-black-7); 
+}
+
+calendar * {
+	border-color: var(--color-gray-5) !important;
+	/* border-bottom: var(--color-gray-5) !important; */
+}
