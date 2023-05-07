@@ -9,7 +9,7 @@
         time_entry_context_use,
 	} from "@heimtime/api";
 	import { WeekGrid, context_card_init, WeekSwitcher } from "@heimtime/uilib"
-	import { time_entry_sync } from "./time_entry_sync"
+
 	
 	// 
 	// Config
@@ -32,7 +32,7 @@
 	let project_sets: Project[][] = []
  
 	$: load_project_sets(date_start, date_end)
-	time_entry_sync(api)
+	// time_entry_sync(api)
 
 
 

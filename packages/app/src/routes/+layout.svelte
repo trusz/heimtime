@@ -1,11 +1,14 @@
 <script lang="ts">
   	// import { Auth_Module } from "@heimtime/api";
-	import { goto } from "$app/navigation";
-  	import { onMount } from "svelte";
+	import { goto } from "$app/navigation"
+  	import { onMount } from "svelte"
 	import { context_api_get, context_api_create } from "../api"
-	import { page }  from '$app/stores';
-  	import { Auth_Module } from "@heimtime/api";
+	import { page }  from '$app/stores'
+  	import { Auth_Module } from "@heimtime/api"
 	import "@heimtime/uilib/src/lib/style.css"
+	import "../style.css"
+	import "@heimtime/uilib/src/lib/style.css"
+
 
 	export const ssr = false;
 	export const prerender = false;
@@ -51,4 +54,14 @@
 	
 </script>
 
-<slot ></slot>
+<main>
+	<slot></slot>
+</main>
+
+<style>
+	main{
+		display: block;
+		padding: 1rem;
+		height:  100%;
+	}
+</style>

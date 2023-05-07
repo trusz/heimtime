@@ -101,15 +101,26 @@ type Response_Tracked_Times = {
 			status: {id:1},
 			project: {id: number, name: string },
 			task: {id: number, name: string, isBillable: null},
+			type: "WORKING_HOURS" | "PUBLIC_HOLIDAY" | "FLEXIDAY",
 		}[]
 	}[]
 }
 
+const Time_Entry_Type = {
+	WORKING_HOURS: "WORKING_HOURS",
+	PUBLIC_HOLIDAY: "PUBLIC_HOLIDAY",
+	FLEXIDAY: "FLEXIDAY",
+} as const
+
 function time_entries_from_response(resp: Response_Tracked_Times): Time_Entry[] {
 	const time_entires: Time_Entry[] = []
+	console.log({level:"dev", msg:"time_entries_from_response", resp: resp.trackedTimesDate})
 	
 	for(let ttd of resp.trackedTimesDate){		
-		for( let tt of ttd.trackedTimes){
+		for(let tt of ttd.trackedTimes){
+			// debugger;
+			if(tt.type !== Time_Entry_Type.WORKING_HOURS){ continue }
+
 			const time_entry = new_time_entry2({
 				id: 	 	 tt.id,
 				start: 	 	 new Date(`${tt.date} ${tt.start}`),

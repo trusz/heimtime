@@ -16,7 +16,7 @@ export function context_card_init(){
 export function context_card_use(){
 	const ctx = getContext<Card_Context>(context_key)
 	if(!ctx){
-		console.warn({level:"warn", msg:"card context has not been initalized"})
+		console.warn({level: "warn", msg: "card context has not been initalized"})
 	}
 	return ctx
 }

@@ -24,7 +24,7 @@
 		if(!jwt || jwt === ""){ return }
 		
 		api.jwt_set(jwt)
-		goto("/week")
+		goto("/calendar")
 	})
 
 	export function sign_in(): void {

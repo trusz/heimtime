@@ -21,28 +21,43 @@ export type EventInput = Event | {
 
 // https://github.com/vkurko/calendar#duration-object
 export type Options = Partial<{
-	items: 		     Event[],
-	view:            "timeGridWeek",
-	slotDuration:    string | number | Duration,
-	events: 	     Event[],
-	editable:        boolean,
-	eventClick:      EventClick,
-	slotMaxTime:     string | number,
-	slotMinTime:     string | number,
-	datesSet: 	     DatesSet,
-	eventDrop: 	     EventDropFn,
-	eventDragStop:   EventDragStopFn,
-	eventDragStart:  EventDragStartFn,
-	eventContent:    string | Object | EventContentFn
-	eventTimeFormat: {hour: string, minute: string} | ((time:Date) => string),
-	selectable:      boolean,
-	select: 		 SelectFn,
-	pointer: 		 boolean,
-	dayMaxEvents: 	 boolean,
-	nowIndicator:    boolean,
-	eventDidMount:   EventDidMountFn,
+	items: 		     	   Event[],
+	view:            	   "timeGridWeek",
+	slotDuration:    	   string | number | Duration,
+	events: 	     	   Event[],
+	editable:        	   boolean,
+	eventClick:      	   EventClick,
+	slotMaxTime:     	   string | number,
+	slotMinTime:     	   string | number,
+	datesSet: 	     	   DatesSet,
+	eventDrop: 	     	   EventDropFn,
+	eventDragStop:   	   EventDragStopFn,
+	eventDragStart:  	   EventDragStartFn,
+	eventContent:    	   string | Object | EventContentFn
+	eventTimeFormat: 	   {hour: string, minute: string} | ((time:Date) => string),
+	eventResize:     	   EventResizeFn,
+	selectable:      	   boolean,
+	select: 		 	   SelectFn,
+	pointer: 		 	   boolean,
+	dayMaxEvents: 	 	   boolean,
+	nowIndicator:    	   boolean,
+	eventDidMount:   	   EventDidMountFn,
 	resourceLabelDidMount: ResourceLabelDidMountFn,
+	locale:		  	   	   string,
+	dayHeaderFormat: 	   {weekday: string, month: string, day: string} | DayHeaderFormatFn,
+	firstDay:		  	   number,
+	duration:		  	   Duration,
+	hiddenDays:		  	   number[],
 }>
+
+export type DayHeaderFormatFn = (time: Date) => string
+
+export type EventResizeFn = (info: EventResizeInfo) => void
+export type EventResizeInfo = {
+	event: Event,
+	jsEvent: MouseEvent,
+	view: View,
+}
 
 export type EventContentFn = (info: EventContentInfo) => string | Object
 export type EventContentInfo = {

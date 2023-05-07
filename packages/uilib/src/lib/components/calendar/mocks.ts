@@ -1,26 +1,27 @@
-import { date_add_days, date_format_iso, date_week_frames, new_project, new_task, Time_Entry_Action, time_entry_context_init, time_entry_context_use, time_entry_execute_action, Time_Entry_State, type Time_Entry, init_project_context, use_project_context } from "@heimtime/api";
-import { context_card_init } from "../card"
-import {get} from "svelte/store"
+import { 
+	Time_Entry_State, 
+	date_add_days, 
+	date_format_iso, 
+	init_project_context, 
+	new_project, 
+	new_task, 
+	time_entry_context_init_v2, 
+	time_entry_context_use_v2, 
+	use_project_context, 
+	type Project, 
+	type Task, 
+	type Time_Entry,
+ } from "@heimtime/api";
+import { get } from "svelte/store";
 
-export function initMocks(){
+export function init_mocks(){
 	
 	// 
 	// Context
 	// 
-	time_entry_context_init()
-	context_card_init()
-	const { 
-		store_time_entry_to_save, 
-		store_time_entry_to_delete,
-        store_time_entry,
-		update_time_entry_by_id, 
-		create_time_entry,
-		create_time_entry_v2,
-		delete_time_entry, 
-	} = time_entry_context_use()
-
+	time_entry_context_init_v2()
 	init_project_context()
-	// context_card_init()
+
 	const { add_project, store_projects } = use_project_context()
 	add_project(
 		new_project(
@@ -43,7 +44,8 @@ export function initMocks(){
 		)
 	)
 
-	create_time_entry_v2({
+	const time_entries = time_entry_context_use_v2()
+	time_entries.create_time_entry({
 		start:       new Date(date_format_iso(new Date())+" 08:00"),
 		end:         new Date(date_format_iso(new Date())+" 09:30"),
 		project:     get(store_projects)[0],
@@ -52,35 +54,45 @@ export function initMocks(){
 		description: "this was already here 1"
 	})
 
-	create_time_entry_v2({
+	time_entries.create_time_entry({
 		start:       new Date(date_format_iso(date_add_days(new Date(), +1))+" 10:00"),
 		end:         new Date(date_format_iso(date_add_days(new Date(), +1))+" 11:30"),
-		project:     get(store_projects)[0],
+		project:     get(store_projects)[1],
 		task:        get(store_projects)[1].tasks[1],
 		state:       Time_Entry_State.Stable,
 		description: "this was already here 2"
 	})
 
     // 
-    // Mockup
-    // 
-    // 
 	// API Mocks
 	// 
-	store_time_entry_to_save.subscribe(async (time_entries_to_save: Time_Entry[])=>{
+	time_entries.store_to_save.subscribe(async (time_entries_to_save: Time_Entry[])=>{
 		// console.log({level: "dev", msg: "entries to save", time_entries_to_save})
 		await new Promise(r => setTimeout(r, 2_000))
 		for(const te of time_entries_to_save){
-			const modified_te = time_entry_execute_action(te, Time_Entry_Action.Save_Success)
-			update_time_entry_by_id(te.id, modified_te)
+			// sync task with project
+			const project = find_project_of_task(te.task, get(store_projects))
+			time_entries.delete(te.id)
+			time_entries.create_time_entry({
+				...te,
+				state:   Time_Entry_State.Stable,
+				project: project
+			})
+			// time_entries.set_state(te.id, Time_Entry_State.Stable)
 		}
 
 	})
-	store_time_entry_to_delete.subscribe(async (time_entries_to_delete: Time_Entry[])=>{
+
+	time_entries.store_to_delete.subscribe(async (time_entries_to_delete: Time_Entry[])=>{
 		await new Promise(r => setTimeout(r, 2_000))
 		for(const te of time_entries_to_delete){
-			delete_time_entry(te.id)
+			time_entries.delete(te.id)
 		}
 	})
 
+}
+
+function find_project_of_task(task: Task | undefined, projects: Project[]): Project | undefined{
+	if(!task){ return }
+	return projects.find(p => p.tasks.includes(task))
 }

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { tick } from "svelte";
+  import { tick, onDestroy } from "svelte";
   import { identity } from "svelte/internal";
 
 	//
@@ -64,8 +64,7 @@
 	$: pos_x = `${x}px`;
 	$: pos_y = `${y}px`;
 
-	let scroll_y = 0;
-	$: pos_y_with_scroll = `${y-scroll_y}px`
+	// TODO: remove the listener at some point
 	$: scroll_tracking(anchor_el, is_open, track_scrolling)
 	function scroll_tracking(node?: HTMLElement, is_open?: boolean, track_scrolling?: boolean){
 		if(!is_open) { return }
@@ -73,17 +72,12 @@
 		if(!node){ return }
 
 		const scroll_el = find_closest_scrolling_element(node)
-		// console.log({level:"dev", msg:"scroll_tracking", scroll_el, node, is_open, track_scrolling})
+		scroll_el.removeEventListener("scroll", handle_parent_scroll)
 		scroll_el.addEventListener("scroll", handle_parent_scroll)
-		return {
-			destroy(){
-				scroll_el?.removeEventListener("scroll", handle_parent_scroll)
-			}
-		}
 	}
 
+
 	function find_closest_scrolling_element(node?: HTMLElement | null): HTMLElement{
-		// if(!node){ return null }
 		if(!node){ return document.body }
 
 		const node_rect = node.getClientRects()
@@ -92,45 +86,26 @@
 		if(node.scrollHeight > node.clientHeight && node_height > 0){
 			return node;
 		}
+		if(!node.parentElement){
+			console.warn({level:"warn", msg:"finding scrolling element, node does not have parent", node})
+		}
 		return find_closest_scrolling_element(node.parentNode as HTMLElement);
 	}
 
 	function handle_parent_scroll(event: Event){
 		set_dropdown_position(anchor_el)
-
-		// const scroll_el = event.target as HTMLElement
-		// const scroll_el_rect = scroll_el.getBoundingClientRect()
-		// const {top,bottom} = scroll_el_rect
-
-		// const anchor_rect = anchor_el!.getBoundingClientRect()
-		// const {top:anchor_top, bottom:anchor_bottom} = anchor_rect
-
-		// const popup_rect = popup.firstElementChild!.getBoundingClientRect()
-		// const {height:popup_height, top: popup_top} = popup_rect
-
-		// const el = event.target as HTMLElement
-		// const {scrollTop} = el
-		// const new_pos = y - scrollTop
-		// const popup_bottom = new_pos + popup_height;
-		// if(new_pos > top){
-		// 	scroll_y = top
-		// }
-		// if( popup_bottom < bottom ){
-		// 	scroll_y = bottom - popup_height
-		// }
-
 	}
 
 </script>
 
 <svelte:body on:click|capture={handle_body_click} />
-<!-- <svelte:body on:click={handle_body_click} /> -->
+
 
 <popup>
 	<div 
 		class="popup" 
 		class:show={is_open}
-		style={ `--pos-x:${pos_x}; --pos-y:${pos_y_with_scroll};`} 
+		style={ `--pos-x:${pos_x}; --pos-y:${pos_y};`} 
 		bind:this={popup}
 	>
 		<slot></slot>
