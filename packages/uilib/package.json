@@ -19,12 +19,12 @@
 		"lint": "eslint ."
 	},
 	"dependencies": {
-		"@event-calendar/interaction": "^0.18.1",
-		"@event-calendar/time-grid": "^0.18.1",
+		"@event-calendar/interaction": "^1.5.1",
+		"@event-calendar/time-grid": "^1.5.1",
 		"@heimtime/api": "workspace: ^1.0.0"
 	},
 	"devDependencies": {
-		"@event-calendar/core": "^0.18.1",
+		"@event-calendar/core": "^1.5.1",
 		"@playwright/test": "^1.28.1",
 		"@sveltejs/adapter-auto": "^1.0.0",
 		"@sveltejs/kit": "^1.0.0",
