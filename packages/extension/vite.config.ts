@@ -6,12 +6,16 @@ const isDevelopment = process.env.NODE_ENV === 'development'
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [svelte()],
+    preview:{
+        port: 51021,
+    },
     build:{
         lib:{
-            entry: "src/plugin.ts",
+            entry: "src/main.ts",
             formats: ['es'],
             fileName: "index",
         },
-        sourcemap: isDevelopment ? "inline" : false,
+        // sourcemap: isDevelopment ? "inline" : false,
+        sourcemap: "inline",
     }
 })

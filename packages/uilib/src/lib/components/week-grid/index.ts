@@ -1,1 +1,0 @@
-export { default as WeekGrid } from "./week_grid.svelte"

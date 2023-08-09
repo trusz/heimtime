@@ -1,8 +1,12 @@
-import './app.css'
 import App from './App.svelte'
 
-const app = new App({
-  target: document.getElementById('app'),
-})
+function init(){
+ 
+    new App({
+        target: document.getElementById('view-root'),
+        props: {}
+    })
+    
+}
 
-export default app
+export default init

@@ -2,3 +2,4 @@ packages:
   - "packages/app"
   - "packages/api"
   - "packages/uilib"
+  - "packages/extension"

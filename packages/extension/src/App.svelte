@@ -1,47 +1,119 @@
 <script lang="ts">
-  import svelteLogo from './assets/svelte.svg'
-  import viteLogo from '/vite.svg'
-  import Counter from './lib/Counter.svelte'
+    
+
+  	import { context_api_create, context_api_get } from "./lib/api";
+    import { Auth_Module } from "./lib/api/auth";
+  	import { type Project, context_project_init, context_project_use } from "./lib/api/project";
+  	import { time_entry_context_init_v2, time_entry_context_use_v2 } from "./lib/api/time_entry";
+  	import { date_add_days, date_format_iso } from "./lib/api/x/date";
+    import { type Date_Changed_Info, Calendar } from "./lib/components/calendar";
+  	import { time_entry_sync } from "./lib/time_entry_sync";
+	
+	// 
+	// Config
+	// 
+
+	const base_url = "https://heimat.sprinteins.com/api/v1/"
+	// const base_url = "http://localhost:62866/api/v1/"
+
+    // 
+    // Auth
+    // 
+    let auth_module: Auth_Module
+    auth_module = new Auth_Module();
+    const jwt = auth_module.jwt_get()
+
+    // 
+    // API
+    // 
+    context_api_create()
+    let api = context_api_get()
+    console.log({level:"dev", msg:"app.svelte set base url", base_url})
+    api.set_base_url(base_url)
+
+    console.log({level:"dev", msg:"app.svelte set jwt", jwt})
+    if(jwt && jwt !== ""){
+        api.jwt_set(jwt)
+    }
+	
+	//
+	// Setup
+	//
+
+    const baseURL = new URL(import.meta.url)
+    const cssURL = new URL("style.css", baseURL)
+    const styleURL = cssURL.toString()
+    
+	time_entry_context_init_v2()
+	const ctx_time_entires = time_entry_context_use_v2()
+
+	context_project_init()
+	const ctx_projects = context_project_use()
+
+	let date_start = new Date()
+	let date_end = new Date()
+	$: load_project_sets(date_start, date_end)
+	$: load_time_entires(date_start, date_end)
+	
+	time_entry_sync(api)
+
+	
+	// 
+	// Functions
+	// 
+	async function load_time_entires(start: Date, end: Date){
+		const time_entires = await api.fetch_time_entires(start, end)
+		ctx_time_entires.clear()
+		for(const te of time_entires){
+			ctx_time_entires.create_time_entry(te)
+		}
+	}
+
+	async function load_project_sets(start: Date, end: Date) {
+		let project_promises: Promise<Project[]>[]=[];
+		for(let di=0;di<7;di++) {
+			const d=date_add_days(start,di);
+			const prom=api.fetch_projects(d);
+			project_promises.push(prom);
+		}
+
+		const project_sets = await Promise.all(project_promises);
+
+		for(let pi=0,pl=project_sets.length; pi<pl; pi++) {
+			const d=date_add_days(start,pi);
+			const project_set=project_sets[pi];
+			ctx_projects.set_projects(date_format_iso(d),project_set);
+		}
+	}
+
+	function handle_datechanged(event: CustomEvent<Date_Changed_Info>){
+		const {start, end} = event.detail
+		date_start = start
+		date_end = end
+	}
+	
+
+    
 </script>
 
-<main>
-  <div>
-    <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-      <img src={viteLogo} class="logo" alt="Vite Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank" rel="noreferrer">
-      <img src={svelteLogo} class="logo svelte" alt="Svelte Logo" />
-    </a>
-  </div>
-  <h1>Vite + Svelte</h1>
+<svelte:head>
+    <link rel="stylesheet" href={styleURL}>
+</svelte:head>
 
-  <div class="card">
-    <Counter />
-  </div>
-
-  <p>
-    Check out <a href="https://github.com/sveltejs/kit#readme" target="_blank" rel="noreferrer">SvelteKit</a>, the official Svelte app framework powered by Vite!
-  </p>
-
-  <p class="read-the-docs">
-    Click on the Vite and Svelte logos to learn more
-  </p>
-</main>
+<calendar>
+	<h1>Heimtime</h1>
+	<Calendar on:datechanged={handle_datechanged} />
+</calendar>
 
 <style>
-  .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: filter 300ms;
-  }
-  .logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00aa);
-  }
-  .read-the-docs {
-    color: #888;
-  }
+	calendar{
+		display: 			grid;
+		grid-template-rows: auto minmax(0, 1fr);
+    	flex-direction: 	column;
+		height:  			100%;
+	}
+
+	/* :global(calender .ec-day.ec-today){
+		background-color: none;
+	} */
 </style>
