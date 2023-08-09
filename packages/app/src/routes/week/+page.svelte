@@ -14,8 +14,6 @@
 	// 
 	// Config
 	// 
-	export const ssr = false;
-	export const prerender = false;
 	const api = context_api_get()
 	
 	// 

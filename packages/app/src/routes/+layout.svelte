@@ -9,9 +9,6 @@
 	import "../style.css"
 	import "@heimtime/uilib/src/lib/style.css"
 
-
-	export const ssr = false;
-	export const prerender = false;
 	
 	// const base_url = "https://heimat.sprinteins.com/api/v1"
 	const base_url = "http://localhost:62866/api/v1/"

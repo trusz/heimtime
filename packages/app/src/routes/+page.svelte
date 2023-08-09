@@ -4,9 +4,6 @@
   import { context_api_create, context_api_get, parse_jwt, type Claims } from "../api";
   import { onMount } from "svelte";
 
-	export const ssr = false;
-	export const prerender = false;
-	
 	// const base_url = "https://heimat.sprinteins.com/api/v1"
 	// const base_url = "http://localhost:62866/api/v1/"
 	const base_url = window.location.origin
