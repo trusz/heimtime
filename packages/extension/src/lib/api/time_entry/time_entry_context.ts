@@ -58,7 +58,7 @@ export function time_entry_context_use () {
 }
 
 function create_time_entry_v2 (
-    ...time_entries_to_create: Array<Partial<Time_Entry>>
+    ...time_entries_to_create: Partial<Time_Entry>[]
 ) {
     const new_time_entries = time_entries_to_create.map((te) => new_time_entry2(te))
     // const time_entry = new_time_entry2(time_entries_to_create)

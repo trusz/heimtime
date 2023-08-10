@@ -30,14 +30,14 @@ export class Project_API {
 }
 
 interface Response_Project {
-    projects: Array<{
+    projects: {
         id:    number
         name:  string
-        tasks: Array<{
+        tasks: {
             id:   number
             name: string
-        }>
-    }>
+        }[]
+    }[]
 }
 
 function projects_from_response (resp: Response_Project): Project[] {

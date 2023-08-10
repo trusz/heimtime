@@ -81,16 +81,16 @@ export class Time_Entry_API {
 
 interface Response_Tracked_Times {
     id:               number // employee id
-    types:            Array<"WORKING_HOURS" | "PUBLIC_HOLIDAY">
+    types:            ("WORKING_HOURS" | "PUBLIC_HOLIDAY")[]
     firstName:        string
     lastName:         string
     lockStatus:       { id: number } // 1=locked, 2=editable
     projectIds:       null
-    trackedTimesDate: Array<{
+    trackedTimesDate: {
         date:                Date_ISO
         plannedWorkingHours: number
         publicHoliday:       null | string
-        trackedTimes: Array<{
+        trackedTimes: {
             id:       number
             date:     Date_ISO
             employee: { id: number }
@@ -101,8 +101,8 @@ interface Response_Tracked_Times {
             project:  { id: number, name: string }
             task:     { id: number, name: string, isBillable: null }
             type:     "WORKING_HOURS" | "PUBLIC_HOLIDAY" | "FLEXIDAY"
-        }>
-    }>
+        }[]
+    }[]
 }
 
 const time_entry_type = {
@@ -137,12 +137,12 @@ function time_entries_from_response (resp: Response_Tracked_Times): Time_Entry[]
 interface Post_Tracked_Times {
     date:         Date_ISO
     employee:     { id: number }
-    trackedTimes: Array<{
+    trackedTimes: {
         start: Time_String
         end:   Time_String
         note:  string
         task:  { id: number }
-    }>
+    }[]
 }
 
 function time_entry_to_post_tracked_times (time_entry: Time_Entry, employee_id: number): Post_Tracked_Times {
@@ -160,12 +160,12 @@ function time_entry_to_post_tracked_times (time_entry: Time_Entry, employee_id: 
 
 interface Put_Tracked_Times {
     date:         Date_ISO
-    trackedTimes: Array<{
+    trackedTimes: {
         start: Time_String
         end:   Time_String
         note:  string
         task:  { id: number }
-    }>
+    }[]
 }
 
 function time_entry_to_put_tracked_times (time_entry: Time_Entry): Put_Tracked_Times {

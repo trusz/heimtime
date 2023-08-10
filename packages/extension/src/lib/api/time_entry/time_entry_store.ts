@@ -9,7 +9,7 @@ export class Time_Entries {
     public store_to_delete = derived_by_state(this._store, Time_Entry_State.Deleting)
 
     public create_time_entry (
-        ...time_entries_to_create: Array<Partial<Time_Entry>>
+        ...time_entries_to_create: Partial<Time_Entry>[]
     ) {
         const new_time_entries = time_entries_to_create.map((te) => new_time_entry2(te))
         this._store.update((time_entries) => [...time_entries, ...new_time_entries])
