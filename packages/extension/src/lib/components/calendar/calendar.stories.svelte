@@ -16,5 +16,4 @@
 
 	init_mocks()
 
-    
 </script>

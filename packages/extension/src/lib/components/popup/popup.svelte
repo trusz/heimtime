@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { tick, onDestroy } from "svelte";
-  import { identity } from "svelte/internal";
+  import { tick } from "svelte";
 
 	//
 	// INPUT

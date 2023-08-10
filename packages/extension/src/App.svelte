@@ -8,6 +8,7 @@
   	import { date_add_days, date_format_iso } from "./lib/api/x/date";
     import { type Date_Changed_Info, Calendar } from "./lib/components/calendar";
   	import { time_entry_sync } from "./lib/time_entry_sync";
+	import { Theme } from "./lib/components/theme"
 	
 	// 
 	// Config
@@ -101,8 +102,10 @@
 </svelte:head>
 
 <calendar>
-	<h1>Heimtime</h1>
-	<Calendar on:datechanged={handle_datechanged} />
+	<Theme>
+		<h1>Heimtime</h1>
+		<Calendar on:datechanged={handle_datechanged} />
+	</Theme>
 </calendar>
 
 <style>

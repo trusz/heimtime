@@ -1,4 +1,5 @@
 /* eslint-disable */
+/* @ts-ignore */
 const DEFAULT_COLOR = "#f2f2f2"
 
 // https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript

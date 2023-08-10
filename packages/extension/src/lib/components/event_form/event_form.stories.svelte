@@ -67,7 +67,7 @@
     
     function handle_save(e: CustomEvent<Event_Save>){
         console.log({level:"dev", message: "handle_save", e})
-        action("save", e)
+        action("save")({event: e})
     }
     
 </script>

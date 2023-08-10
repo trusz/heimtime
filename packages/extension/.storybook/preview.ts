@@ -1,4 +1,5 @@
 import type { Preview } from "@storybook/svelte";
+import {Theme} from "../src/lib/components/theme";
 
 const preview: Preview = {
   parameters: {
@@ -10,6 +11,9 @@ const preview: Preview = {
       },
     },
   },
+  decorators: [
+    () => Theme
+  ]
 };
 
 export default preview;
