@@ -33,7 +33,6 @@ export class API {
     public fetch_employee = async (id: number) => await this.employee_api.fetch_employee(id)
 
     public set_base_url (url: string) {
-        console.log({ level: "dev", message: "set_base_url", url })
         this.base_url = url
         this.project_api.base_url = url
         this.employee_api.base_url = url

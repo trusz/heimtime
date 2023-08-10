@@ -28,6 +28,7 @@ module.exports = {
         "@typescript-eslint/naming-convention": ["error", {"selector": "variableLike", "format": ["snake_case"] }],
         "@typescript-eslint/key-spacing": ["error", { "align": "value" }],
         "@typescript-eslint/strict-boolean-expressions": "off",
+        "@typescript-eslint/array-type": ["error", { "default": "array-simple" }],
         "@typescript-eslint/no-misused-promises": [
             "error",
             { 

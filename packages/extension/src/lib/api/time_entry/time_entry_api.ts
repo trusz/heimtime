@@ -113,7 +113,6 @@ const time_entry_type = {
 
 function time_entries_from_response (resp: Response_Tracked_Times): Time_Entry[] {
     const time_entires: Time_Entry[] = []
-    console.log({ level: "dev", msg: "time_entries_from_response", resp: resp.trackedTimesDate })
 
     for (const ttd of resp.trackedTimesDate) {
         for (const tt of ttd.trackedTimes) {

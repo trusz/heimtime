@@ -135,6 +135,7 @@
 
     $: load_events($store)
     function load_events(time_entires: Time_Entry[]){
+        console.log({level:"dev", message: "load_events", time_entires})
         const new_events = time_entires.map(time_entry_to_event)
 
         if(!ec){ return }
@@ -145,23 +146,24 @@
 
     function time_entry_to_event(te: Time_Entry): Event {
         const color_hash = `${te.project?.name??""}`
-            let color = string_to_color(color_hash)
-            if(color_hash === ""){
-                color = "var(--color-gray-6)"
-            }
+        let color = string_to_color(color_hash)
+        if(color_hash === ""){
+            color = "var(--color-grey-2)"
+        }
+        console.log({level:"dev", message: "color_hash", te, color_hash, color, color2: string_to_color(color_hash)})
 
-            return {
-                id: String(te.id),
-                allDay: false,
-                start: te.start,
-                end: te.end,
-                // editable: true,
-                editable: te.state === Time_Entry_State.Stable,
-                durationEditable: te.state === Time_Entry_State.Stable,
-                startEditable: te.state === Time_Entry_State.Stable,
-                backgroundColor: color,
-                extendedProps: te,
-            }
+        return {
+            id: String(te.id),
+            allDay: false,
+            start: te.start,
+            end: te.end,
+            // editable: true,
+            editable: te.state === Time_Entry_State.Stable,
+            durationEditable: te.state === Time_Entry_State.Stable,
+            startEditable: te.state === Time_Entry_State.Stable,
+            backgroundColor: color,
+            extendedProps: te,
+        }
     }
 
     // #endregion event mapping
@@ -288,7 +290,7 @@
         /* border-radius:    var(--border-radius); */
         /* background-color: var(--bg-color, #ffffff18); */
 
-        /* backdrop-filter:  		 blur(3px); */
+        backdrop-filter:  		 blur(3px);
         /* -webkit-backdrop-filter: blur(3px); */
 
         padding: 0.3rem 0.5rem;

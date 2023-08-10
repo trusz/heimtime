@@ -11,6 +11,59 @@ export function init_mocks () {
     init_project_context()
     context_project_init()
     const ctx_projects = context_project_use()
+    const time_entries = time_entry_context_use_v2()
+
+    //
+    // Setup
+    //
+
+    //
+    // API Mocks
+    //
+    time_entries.store_to_save.subscribe(async (time_entries_to_save: Time_Entry[]) => {
+        // console.log({level: "dev", msg: "entries to save", time_entries_to_save})
+        await Promise.all(
+            time_entries_to_save.map(async (te) => {
+                await new Promise(resolve => setTimeout(resolve, 2_000))
+                // sync task with project
+                const date = date_format_iso(te.start)
+
+                const projects = get(ctx_projects.store).get(date) ?? []
+                const project = find_project_of_task(te.task, projects)
+                console.log({ level: "dev", msg: "syncing task with project",  project, projects, date, te })
+                time_entries.delete(te.id)
+                time_entries.create_time_entry({
+                    ...te,
+                    state: Time_Entry_State.Stable,
+                    project
+                })
+            // time_entries.set_state(te.id, Time_Entry_State.Stable)
+            })
+        )
+        // for (const te of time_entries_to_save) {
+        //     // sync task with project
+        //     const date = date_format_iso(te.start)
+        //     const project = find_project_of_task(te.task, get(ctx_projects.store)[date] ?? [])
+        //     time_entries.delete(te.id)
+        //     time_entries.create_time_entry({
+        //         ...te,
+        //         state: Time_Entry_State.Stable,
+        //         project
+        //     })
+        //     // time_entries.set_state(te.id, Time_Entry_State.Stable)
+        // }
+    })
+
+    time_entries.store_to_delete.subscribe(async (time_entries_to_delete: Time_Entry[]) => {
+        await new Promise(resolve => setTimeout(resolve, 2_000))
+        for (const te of time_entries_to_delete) {
+            time_entries.delete(te.id)
+        }
+    })
+
+    //
+    // Execution
+    //
 
     const yesterday: string = date_format_iso(date_add_days(new Date(), -1))
     const today: string = date_format_iso(new Date())
@@ -26,35 +79,31 @@ export function init_mocks () {
     )
     ctx_projects.create_project(
         today,
-        new_project(0, "first", [new_task(0, "1.1"), new_task(1, "1.2"), new_task(2, "1.3")])
+        new_project(2, "first", [new_task(0, "1.1"), new_task(1, "1.2"), new_task(2, "1.3")])
     )
     ctx_projects.create_project(
         today,
-        new_project(1, "second", [new_task(3, "2.1"), new_task(4, "2.2"), new_task(5, "2.3")])
+        new_project(3, "second", [new_task(3, "2.1"), new_task(4, "2.2"), new_task(5, "2.3")])
     )
     ctx_projects.create_project(
         tomorrow,
-        new_project(0, "first", [new_task(0, "1.1"), new_task(1, "1.2"), new_task(2, "1.3")])
+        new_project(4, "first", [new_task(0, "1.1"), new_task(1, "1.2"), new_task(2, "1.3")])
     )
     ctx_projects.create_project(
         tomorrow,
-        new_project(1, "second", [new_task(3, "2.1"), new_task(4, "2.2"), new_task(5, "2.3")])
+        new_project(5, "second", [new_task(3, "2.1"), new_task(4, "2.2"), new_task(5, "2.3")])
     )
-    console.log({ level: "dev", msg: "projects", projects: get(ctx_projects.store) })
     const yesterday_projects = get(ctx_projects.store).get(yesterday) ?? []
     const today_projects = get(ctx_projects.store).get(today) ?? []
     const tomorrow_projects = get(ctx_projects.store).get(tomorrow) ?? []
 
-    console.log({ level: "dev", msg: "today projects", today_projects, tomorrow_projects, yesterday_projects })
-
-    const time_entries = time_entry_context_use_v2()
     time_entries.create_time_entry({
         start:       new Date(today + " 08:00"),
         end:         new Date(today + " 09:30"),
         project:     today_projects[0],
         task:        today_projects[0].tasks[0],
         state:       Time_Entry_State.Saving,
-        description: "this was already here 1"
+        description: "this was already here (today)"
     })
 
     time_entries.create_time_entry({
@@ -63,7 +112,7 @@ export function init_mocks () {
         project:     tomorrow_projects[1],
         task:        tomorrow_projects[1].tasks[1],
         state:       Time_Entry_State.Stable,
-        description: "this was already here 2"
+        description: "this was already here (tomorrow)"
     })
     time_entries.create_time_entry({
         start:       new Date(yesterday + " 12:00"),
@@ -71,35 +120,7 @@ export function init_mocks () {
         project:     yesterday_projects[1],
         task:        yesterday_projects[1].tasks[1],
         state:       Time_Entry_State.Stable,
-        description: "this was already here 2"
-    })
-
-    //
-    // API Mocks
-    //
-    time_entries.store_to_save.subscribe(async (time_entries_to_save: Time_Entry[]) => {
-    // console.log({level: "dev", msg: "entries to save", time_entries_to_save})
-        await new Promise(resolve => setTimeout(resolve, 2_000))
-        for (const te of time_entries_to_save) {
-            // sync task with project
-            const date = date_format_iso(te.start)
-            console.log({ level: "dev", msg: "date", date })
-            const project = find_project_of_task(te.task, get(ctx_projects.store)[date] ?? [])
-            time_entries.delete(te.id)
-            time_entries.create_time_entry({
-                ...te,
-                state: Time_Entry_State.Stable,
-                project
-            })
-            // time_entries.set_state(te.id, Time_Entry_State.Stable)
-        }
-    })
-
-    time_entries.store_to_delete.subscribe(async (time_entries_to_delete: Time_Entry[]) => {
-        await new Promise(resolve => setTimeout(resolve, 2_000))
-        for (const te of time_entries_to_delete) {
-            time_entries.delete(te.id)
-        }
+        description: "this was already here (yesterday)"
     })
 }
 

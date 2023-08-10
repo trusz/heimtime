@@ -26,7 +26,7 @@ export class HTTP {
         return `Bearer ${this.jwt}`
     }
 
-    private async fetch<T extends Record<string, unknown>>(method: Method, url: string, payload?: unknown): Promise<JSON_Response<T>> {
+    private async fetch<T>(method: Method, url: string, payload?: unknown): Promise<JSON_Response<T>> {
         let body: string | undefined
         if (payload !== undefined) {
             body = JSON.stringify(payload)
@@ -46,11 +46,15 @@ export class HTTP {
         }
 
         const body_text = await resp.text()
-        let json_body = {}
-        try {
-            json_body = JSON.parse(body_text) as T
-        } catch (err) {
-            console.warn({ level: "error", msg: "fetch: could not parse response to json", err, body_text })
+        // eslint did not like it and did not want to invest more time into it
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        let json_body = {} as T
+        if (body_text !== "") {
+            try {
+                json_body = JSON.parse(body_text) as T
+            } catch (err) {
+                console.warn({ level: "error", msg: "fetch: could not parse response to json", method, url, err, body_text })
+            }
         }
 
         const typed_response = {

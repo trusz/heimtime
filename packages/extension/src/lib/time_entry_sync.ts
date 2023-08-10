@@ -13,17 +13,17 @@ export function time_entry_sync (api: API): void {
         //
         // Trying to save
         //
-        // const update_promises = time_entries_to_save.map(async (te) => {
-        //     console.log({ level: "dev", msg: "saving time entry", te })
-        //     const not_yet_on_server = te.id < 0
-        //     if (not_yet_on_server) {
-        //         await api.save_time_entry(te)
-        //     } else {
-        //         await api.update_time_entry(te)
-        //     }
-        // })
+        const update_promises = time_entries_to_save.map(async (te) => {
+            const not_yet_on_server = te.id < 0
+            if (not_yet_on_server) {
+                await api.save_time_entry(te)
+            } else {
+                await api.update_time_entry(te)
+            }
+        })
 
         // const results = await Promise.allSettled(update_promises)
+        await Promise.allSettled(update_promises)
 
         //
         // Update Saved Entries From server

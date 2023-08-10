@@ -24,7 +24,6 @@ export class Project_API {
 
     private url_projects (date: Date): string {
         const url = new URL(this.api_url, this.base_url)
-        console.log({ level: "dev", msg: "url_projects", url: url.toString(), base_url: this.base_url, api_url: this.api_url })
         url.searchParams.set("date", date_format_iso(date))
         return url.toString()
     }
