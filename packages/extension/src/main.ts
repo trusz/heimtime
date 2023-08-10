@@ -1,10 +1,10 @@
-import App from './App.svelte'
+import App from "./App.svelte"
 
 function init () {
-  new App({
-    target: document.getElementById('view-root'),
-    props: {}
-  })
+    new App({
+        target: document.getElementById("view-root"),
+        props: {}
+    })
 }
 
 export default init

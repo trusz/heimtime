@@ -1,102 +1,102 @@
 export interface EventCalendar {
-  getOpion: () => Options
-  setOption: (name: string, value: any) => void
-  getEvents: () => Event[]
-  getEventById: (id: string) => Event | null
-  removeEventById: (id: string | number) => void
-  addEvent: (event: EventInput) => Event | null
-  updateEvent: (event: EventInput) => Event
-  dateFromPoint: (x: number, y: number) => Date
-  unselect: () => void
+    getOpion: () => Options
+    setOption: (name: string, value: any) => void
+    getEvents: () => Event[]
+    getEventById: (id: string) => Event | null
+    removeEventById: (id: string | number) => void
+    addEvent: (event: EventInput) => Event | null
+    updateEvent: (event: EventInput) => Event
+    dateFromPoint: (x: number, y: number) => Date
+    unselect: () => void
 }
 
 export type EventInput = Event | {
-  id: string
-  start: Date
-  end: Date
-  title: string
-  resourceId: string
+    id: string
+    start: Date
+    end: Date
+    title: string
+    resourceId: string
 }
 
 // https://github.com/vkurko/calendar#duration-object
 export type Options = Partial<{
-  items: Event[]
-  view: 'timeGridWeek'
-  slotDuration: string | number | Duration
-  events: Event[]
-  editable: boolean
-  eventClick: EventClick
-  slotMaxTime: string | number
-  slotMinTime: string | number
-  datesSet: DatesSet
-  eventDrop: EventDropFn
-  eventDragStop: EventDragStopFn
-  eventDragStart: EventDragStartFn
-  eventContent: string | Object | EventContentFn
-  eventTimeFormat: { hour: string, minute: string } | ((time: Date) => string)
-  eventResize: EventResizeFn
-  selectable: boolean
-  select: SelectFn
-  pointer: boolean
-  dayMaxEvents: boolean
-  nowIndicator: boolean
-  eventDidMount: EventDidMountFn
-  resourceLabelDidMount: ResourceLabelDidMountFn
-  locale: string
-  dayHeaderFormat: { weekday: string, month: string, day: string } | DayHeaderFormatFn
-  firstDay: number
-  duration: Duration
-  hiddenDays: number[]
+    items: Event[]
+    view: "timeGridWeek"
+    slotDuration: string | number | Duration
+    events: Event[]
+    editable: boolean
+    eventClick: EventClick
+    slotMaxTime: string | number
+    slotMinTime: string | number
+    datesSet: DatesSet
+    eventDrop: EventDropFn
+    eventDragStop: EventDragStopFn
+    eventDragStart: EventDragStartFn
+    eventContent: string | Object | EventContentFn
+    eventTimeFormat: { hour: string, minute: string } | ((time: Date) => string)
+    eventResize: EventResizeFn
+    selectable: boolean
+    select: SelectFn
+    pointer: boolean
+    dayMaxEvents: boolean
+    nowIndicator: boolean
+    eventDidMount: EventDidMountFn
+    resourceLabelDidMount: ResourceLabelDidMountFn
+    locale: string
+    dayHeaderFormat: { weekday: string, month: string, day: string } | DayHeaderFormatFn
+    firstDay: number
+    duration: Duration
+    hiddenDays: number[]
 }>
 
 export type DayHeaderFormatFn = (time: Date) => string
 
 export type EventResizeFn = (info: EventResizeInfo) => void
 export interface EventResizeInfo {
-  event: Event
-  jsEvent: MouseEvent
-  view: View
+    event: Event
+    jsEvent: MouseEvent
+    view: View
 }
 
 export type EventContentFn = (info: EventContentInfo) => string | Object
 export interface EventContentInfo {
-  event: Event
-  timeText: string
-  view: View
+    event: Event
+    timeText: string
+    view: View
 }
 
 export type ResourceLabelDidMountFn = (info: ResourceLabelDidMountInfo) => void
 export interface ResourceLabelDidMountInfo {
-  el: HTMLElement
-  resource: Resource
-  view: View
+    el: HTMLElement
+    resource: Resource
+    view: View
 }
 
 export type EventDidMountFn = (info: EventDidMountInfo) => void
 export interface EventDidMountInfo {
-  el: HTMLElement
-  event: Event
-  isMirror: boolean
-  isStart: boolean
-  isEnd: boolean
-  view: View
+    el: HTMLElement
+    event: Event
+    isMirror: boolean
+    isStart: boolean
+    isEnd: boolean
+    view: View
 }
 
 export type SelectFn = (selection: SelectInfo) => void
 export interface SelectInfo {
-  start: Date
-  end: Date
-  startStr: string
-  endStr: string
-  allDay: boolean
-  jsEvent: MouseEvent
-  view: View
-  resource: Resource
+    start: Date
+    end: Date
+    startStr: string
+    endStr: string
+    allDay: boolean
+    jsEvent: MouseEvent
+    view: View
+    resource: Resource
 }
 
 interface Resource {
-  id: string
-  title: string
+    id: string
+    title: string
 }
 
 /**
@@ -113,11 +113,11 @@ interface Resource {
  */
 
 export interface Duration {
-  years: number
-  months: number
-  days: number
-  seconds: number
-  inWeeks: boolean
+    years: number
+    months: number
+    days: number
+    seconds: number
+    inWeeks: boolean
 }
 
 /**
@@ -142,72 +142,72 @@ export interface Duration {
  */
 
 export type Event = Partial<{
-  id: string
-  resourceIds: string[]
-  allDay: boolean
-  start: Date
-  end: Date
-  title: string
-  titleHTML: string
-  editable: boolean
-  startEditable: boolean
-  durationEditable: boolean
-  display: string
-  backgroundColor: string
-  extendedProps: unknown
+    id: string
+    resourceIds: string[]
+    allDay: boolean
+    start: Date
+    end: Date
+    title: string
+    titleHTML: string
+    editable: boolean
+    startEditable: boolean
+    durationEditable: boolean
+    display: string
+    backgroundColor: string
+    extendedProps: unknown
 }>
 
 export type EventClick = (info: EventClickInfo) => void
 export interface EventClickInfo {
-  event: Event
-  el: HTMLElement
-  jsEvent: MouseEvent
-  view: View
+    event: Event
+    el: HTMLElement
+    jsEvent: MouseEvent
+    view: View
 }
 interface View {
-  type: string
-  title: string
-  activeStart: Date
-  activeEnd: Date
-  currentStart: Date
-  currentEnd: Date
+    type: string
+    title: string
+    activeStart: Date
+    activeEnd: Date
+    currentStart: Date
+    currentEnd: Date
 }
 
 export type DatesSet = (info: DateSetInfo) => void
 
 export interface DateSetInfo {
-  start: Date
-  end: Date
-  startStr: string
-  endStr: string
-  view: View
+    start: Date
+    end: Date
+    startStr: string
+    endStr: string
+    view: View
 }
 
 export type EventDropFn = (info: EventDropInfo) => void
 
 export interface EventDropInfo {
-  event: Event
-  oldEvent: Event
-  delta: Duration
-  revert: () => void
-  jsEvent: MouseEvent
-  view: View
+    event: Event
+    oldEvent: Event
+    delta: Duration
+    revert: () => void
+    jsEvent: MouseEvent
+    view: View
 }
 
 export type EventDragStartFn = (info: EventDragStartInfo) => void
 
 export interface EventDragStartInfo {
-  event: Event
-  el: HTMLElement
-  jsEvent: MouseEvent
-  view: View
+    event: Event
+    el: HTMLElement
+    jsEvent: MouseEvent
+    view: View
 }
 
 export type EventDragStopFn = (info: EventDragStopInfo) => void
 
 export interface EventDragStopInfo {
-  event: Event
-  el: HTMLElement
-  jsEvent: MouseEvent
-  view: View
+    event: Event
+    el: HTMLElement
+    jsEvent: MouseEvent
+    view: View
 }

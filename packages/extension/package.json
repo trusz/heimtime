@@ -14,8 +14,8 @@
     "svelte-check:watch": "svelte-check --watch --preserveWatchOutput",
     "sb": "storybook dev --port 6006 --no-open",
     "build-storybook": "storybook build",
-    "eslint": "eslint --ext .js,.ts,.svelte src",
-    "eslint:fix": "eslint --fix"
+    "eslint": "eslint --ext .js,.ts,.svelte src --fix",
+    "eslint:fix": "npm run eslint -- --fix"
   },
   "devDependencies": {
     "@storybook/addon-actions": "^7.2.2",
