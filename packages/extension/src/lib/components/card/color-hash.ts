@@ -1,3 +1,4 @@
+/* eslint-disable */
 const DEFAULT_COLOR = "#f2f2f2"
 
 // https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
@@ -38,10 +39,10 @@ export function string_to_color (str: string): string {
 }
 
 /* accepts parameters
- * h  Object = {h:x, s:y, v:z}
- * OR
- * h, s, v
- * https://stackoverflow.com/a/17243070/21141047
+* h  Object = {h:x, s:y, v:z}
+* OR
+* h, s, v
+* https://stackoverflow.com/a/17243070/21141047
 */
 function hsv_to_rgb (h: number, s: number, v: number): { r: number, g: number, b: number } {
     let r: number, g: number, b: number
@@ -55,12 +56,12 @@ function hsv_to_rgb (h: number, s: number, v: number): { r: number, g: number, b
     const q = v * (1 - f * s)
     const t = v * (1 - (1 - f) * s)
     switch (i % 6) {
-    case 0: r = v, g = t, b = p; break
-    case 1: r = q, g = v, b = p; break
-    case 2: r = p, g = v, b = t; break
-    case 3: r = p, g = q, b = v; break
-    case 4: r = t, g = p, b = v; break
-    case 5: r = v, g = p, b = q; break
+        case 0: r = v, g = t, b = p; break
+        case 1: r = q, g = v, b = p; break
+        case 2: r = p, g = v, b = t; break
+        case 3: r = p, g = q, b = v; break
+        case 4: r = t, g = p, b = v; break
+        case 5: r = v, g = p, b = q; break
     }
     return {
         r: Math.round(r * 255),
@@ -70,10 +71,10 @@ function hsv_to_rgb (h: number, s: number, v: number): { r: number, g: number, b
 }
 
 /* accepts parameters
- * r  Object = {r:x, g:y, b:z}
- * OR
- * r, g, b
- * https://stackoverflow.com/a/17243070/21141047
+* r  Object = {r:x, g:y, b:z}
+* OR
+* r, g, b
+* https://stackoverflow.com/a/17243070/21141047
 */
 function rgb_to_hsv (r: number, g: number, b: number): { h: number, s: number, v: number } {
     const max = Math.max(r, g, b)
@@ -98,21 +99,21 @@ function rgb_to_hsv (r: number, g: number, b: number): { h: number, s: number, v
 }
 
 /**
- * https://www.programmingcube.com/how-to-convert-rgb-to-hex-and-vice-versa-in-javascript/
- * @param r
- * @param g
- * @param b
- * @returns
- */
+* https://www.programmingcube.com/how-to-convert-rgb-to-hex-and-vice-versa-in-javascript/
+* @param r
+* @param g
+* @param b
+* @returns
+*/
 function rgb_to_hex (r: number, g: number, b: number): string {
     return ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)
 }
 
 /**
- * https://www.programmingcube.com/how-to-convert-rgb-to-hex-and-vice-versa-in-javascript/
- * @param hex
- * @returns
- */
+* https://www.programmingcube.com/how-to-convert-rgb-to-hex-and-vice-versa-in-javascript/
+* @param hex
+* @returns
+*/
 function hex_to_rgb (hex: string): { r: number, g: number, b: number } {
     const r = parseInt(hex.substring(0, 2), 16)
     const g = parseInt(hex.substring(2, 4), 16)

@@ -5,7 +5,7 @@ import { HTTP } from "./x/http"
 
 export class API {
     constructor (
-        private jwt: 	 string = "",
+        private jwt:      string = "",
         private base_url: string = ""
     ) {
         if (jwt !== "") {
@@ -19,9 +19,9 @@ export class API {
         this.time_entry_api = new Time_Entry_API(this.http, base_url, this.employee_id)
     }
 
-    private readonly http: HTTP
-    private project_api: Project_API
-    private time_entry_api: Time_Entry_API
+    private readonly http:         HTTP
+    private project_api:           Project_API
+    private time_entry_api:        Time_Entry_API
     private readonly employee_api: Employee_API
 
     public employee_id = -1
@@ -66,18 +66,18 @@ export class API {
     }
 }
 
-export function parse_jwt<T> (token: string): T {
+export function parse_jwt<T> (token?: string): T {
     if (!token || token === "") {
         throw new Error("now token to parse")
     }
 
-    const base64Url = token.split(".")[1]
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/")
-    const jsonPayload = decodeURIComponent(window.atob(base64).split("").map(function (c) {
+    const base64_url = token.split(".")[1]
+    const base64 = base64_url.replace(/-/g, "+").replace(/_/g, "/")
+    const json_payload = decodeURIComponent(window.atob(base64).split("").map(function (c) {
         return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)
     }).join(""))
 
-    return JSON.parse(jsonPayload)
+    return JSON.parse(json_payload)
 }
 
 export interface Claims {

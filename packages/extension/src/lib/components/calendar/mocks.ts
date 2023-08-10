@@ -34,20 +34,20 @@ export function init_mocks () {
 
     const time_entries = time_entry_context_use_v2()
     time_entries.create_time_entry({
-        start: new Date(date_format_iso(new Date()) + " 08:00"),
-        end: new Date(date_format_iso(new Date()) + " 09:30"),
-        project: get(store_projects)[0],
-        task: get(store_projects)[0].tasks[0],
-        state: Time_Entry_State.Saving,
+        start:       new Date(date_format_iso(new Date()) + " 08:00"),
+        end:         new Date(date_format_iso(new Date()) + " 09:30"),
+        project:     get(store_projects)[0],
+        task:        get(store_projects)[0].tasks[0],
+        state:       Time_Entry_State.Saving,
         description: "this was already here 1"
     })
 
     time_entries.create_time_entry({
-        start: new Date(date_format_iso(date_add_days(new Date(), +1)) + " 10:00"),
-        end: new Date(date_format_iso(date_add_days(new Date(), +1)) + " 11:30"),
-        project: get(store_projects)[1],
-        task: get(store_projects)[1].tasks[1],
-        state: Time_Entry_State.Stable,
+        start:       new Date(date_format_iso(date_add_days(new Date(), +1)) + " 10:00"),
+        end:         new Date(date_format_iso(date_add_days(new Date(), +1)) + " 11:30"),
+        project:     get(store_projects)[1],
+        task:        get(store_projects)[1].tasks[1],
+        state:       Time_Entry_State.Stable,
         description: "this was already here 2"
     })
 
@@ -56,7 +56,7 @@ export function init_mocks () {
     //
     time_entries.store_to_save.subscribe(async (time_entries_to_save: Time_Entry[]) => {
     // console.log({level: "dev", msg: "entries to save", time_entries_to_save})
-        await new Promise(r => setTimeout(r, 2_000))
+        await new Promise(resolve => setTimeout(resolve, 2_000))
         for (const te of time_entries_to_save) {
             // sync task with project
             const project = find_project_of_task(te.task, get(store_projects))
@@ -71,7 +71,7 @@ export function init_mocks () {
     })
 
     time_entries.store_to_delete.subscribe(async (time_entries_to_delete: Time_Entry[]) => {
-        await new Promise(r => setTimeout(r, 2_000))
+        await new Promise(resolve => setTimeout(resolve, 2_000))
         for (const te of time_entries_to_delete) {
             time_entries.delete(te.id)
         }

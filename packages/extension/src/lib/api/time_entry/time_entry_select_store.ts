@@ -2,7 +2,7 @@ import { writable, type Writable, get } from "svelte/store"
 import { getContext, setContext } from "svelte"
 
 const context_key = {}
-const NO_SELECTION = -Infinity
+const no_selection = -Infinity
 
 export function context_time_entry_selection_init () {
     setContext<Select_Context>(context_key, new Select_Context())
@@ -17,7 +17,7 @@ export function context_time_entry_selection_use () {
 }
 
 class Select_Context {
-    public selection_store: Writable<number> = writable(NO_SELECTION)
+    public selection_store: Writable<number> = writable(no_selection)
 
     //
     // Selection
@@ -27,7 +27,7 @@ class Select_Context {
     }
 
     public clear_selection () {
-        this.selection_store.set(NO_SELECTION)
+        this.selection_store.set(no_selection)
     }
 
     public get_selected_time_entry_id (): number {

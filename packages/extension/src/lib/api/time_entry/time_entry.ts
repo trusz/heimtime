@@ -2,22 +2,22 @@ import type { Project, Task } from "../project"
 import { defaults } from "lodash"
 
 export interface Time_Entry {
-    id: number
-    start: Date
-    end: Date
-    state: Time_Entry_State
-    project?: Project
-    task?: Task
+    id:           number
+    start:        Date
+    end:          Date
+    state:        Time_Entry_State
+    project?:     Project
+    task?:        Task
     description?: string
-    is_selected: boolean
+    is_selected:  boolean
 }
 
 function time_entry_default (): Time_Entry {
     return {
-        id: -1 * (Math.random() * 10000 | 0),
-        start: new Date(),
-        end: new Date(),
-        state: Time_Entry_State.In_Progress,
+        id:          -1 * (Math.random() * 10000 | 0),
+        start:       new Date(),
+        end:         new Date(),
+        state:       Time_Entry_State.In_Progress,
         is_selected: false
     }
 }
@@ -55,19 +55,19 @@ export function time_entry_overlap (a: Time_Entry, b: Time_Entry): boolean {
     return Math.max(a.start.getTime(), b.start.getTime()) < Math.min(a.end.getTime(), b.end.getTime())
 }
 
-const HOUR_IN_MINUTES = 60
+const hour_in_minutes = 60
 
 //
 // Slot Transformation
 //
 export function date_to_slot (
-    d: 				 Date,
-    start_hour: 	 number,
+    d:               Date,
+    start_hour:      number,
     step_in_minutes: number
 ): number {
     const hours = d.getHours()
     const minutes = d.getMinutes()
-    const diff_minutes = (hours * HOUR_IN_MINUTES) + minutes - start_hour * HOUR_IN_MINUTES
+    const diff_minutes = (hours * hour_in_minutes) + minutes - start_hour * hour_in_minutes
     const diff_steps = Math.floor(diff_minutes / step_in_minutes)
     const slot_number = diff_steps
 
@@ -75,12 +75,12 @@ export function date_to_slot (
 }
 
 export function slot_to_minutes (
-    slot: 			 number,
-    start_hour: 	 number,
+    slot:            number,
+    start_hour:      number,
     step_in_minutes: number
 ): number {
     const diff_minutes = slot * step_in_minutes
-    const start_minutes = start_hour * HOUR_IN_MINUTES
+    const start_minutes = start_hour * hour_in_minutes
     const minutes = start_minutes + diff_minutes
 
     return minutes
@@ -92,9 +92,9 @@ export function slot_to_minutes (
 
 export enum Time_Entry_State {
     In_Progress = "In_Progress",
-    Saving 		= "Saving",
-    Error 		= "Error",
-    Stable 		= "Stable",
+    Saving      = "Saving",
+    Error       = "Error",
+    Stable      = "Stable",
     Deleting = "Deleting",
 }
 
@@ -103,9 +103,9 @@ export enum Time_Entry_Action {
     Form_Changes = "Form_Changes",
     Form_Finished = "Form_Finished",
     Form_Or_Time_Changes = "Form_Or_Time_Changes",
-    Save_Success 		 = "Save_Success",
-    Save_Error 			 = "Save_Error",
-    Delete 			 	 = "Delete",
+    Save_Success         = "Save_Success",
+    Save_Error           = "Save_Error",
+    Delete               = "Delete",
 }
 
 type State_Machine = {
@@ -116,29 +116,29 @@ type State_Machine = {
 const state_machine: State_Machine = {
     [Time_Entry_State.In_Progress]: {
         [Time_Entry_Action.Creation_Progression]: Time_Entry_State.In_Progress,
-        [Time_Entry_Action.Form_Changes]: Time_Entry_State.In_Progress,
-        [Time_Entry_Action.Form_Finished]: Time_Entry_State.Saving,
-        [Time_Entry_Action.Delete]:	Time_Entry_State.Deleting
+        [Time_Entry_Action.Form_Changes]:         Time_Entry_State.In_Progress,
+        [Time_Entry_Action.Form_Finished]:        Time_Entry_State.Saving,
+        [Time_Entry_Action.Delete]:               Time_Entry_State.Deleting
     },
     [Time_Entry_State.Saving]: {
         [Time_Entry_Action.Save_Success]: Time_Entry_State.Stable,
-        [Time_Entry_Action.Save_Error]: Time_Entry_State.Error
+        [Time_Entry_Action.Save_Error]:   Time_Entry_State.Error
     },
     [Time_Entry_State.Stable]: {
-        [Time_Entry_Action.Form_Finished]: Time_Entry_State.Saving,
-        [Time_Entry_Action.Delete]: Time_Entry_State.Deleting,
+        [Time_Entry_Action.Form_Finished]:        Time_Entry_State.Saving,
+        [Time_Entry_Action.Delete]:               Time_Entry_State.Deleting,
         [Time_Entry_Action.Form_Or_Time_Changes]: Time_Entry_State.In_Progress
     },
     [Time_Entry_State.Error]: {
         [Time_Entry_Action.Form_Or_Time_Changes]: Time_Entry_State.In_Progress,
-        [Time_Entry_Action.Form_Finished]: Time_Entry_State.Saving
+        [Time_Entry_Action.Form_Finished]:        Time_Entry_State.Saving
     },
     [Time_Entry_State.Deleting]: {}
 }
 
 export function time_entry_execute_action (
     time_entry: Time_Entry,
-    action: 	 Time_Entry_Action
+    action:     Time_Entry_Action
 ): Time_Entry {
     const mutated_time_entry = { ...time_entry }
     const possible_actions = state_machine[time_entry.state]

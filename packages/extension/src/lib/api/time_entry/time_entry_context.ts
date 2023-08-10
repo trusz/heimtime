@@ -1,6 +1,6 @@
 import { writable, type Writable, derived, get } from "svelte/store"
 import { getContext, setContext } from "svelte"
-import { new_time_entry2, type Time_Entry, time_entry_overlap, Time_Entry_State } from "./time_entry"
+import { new_time_entry2, type Time_Entry, Time_Entry_State } from "./time_entry"
 import type { Project, Task } from "../project"
 import { Time_Entries } from "./time_entry_store"
 
@@ -31,18 +31,18 @@ const time_entry_context = {
 }
 export type Time_Entry_Context = typeof time_entry_context
 const context_key = {}
-const context_key_V2 = {}
+const context_key_v2 = {}
 
 export function time_entry_context_init () {
     setContext<Time_Entry_Context>(context_key, time_entry_context)
 }
 
 export function time_entry_context_init_v2 () {
-    setContext<Time_Entries>(context_key_V2, new Time_Entries())
+    setContext<Time_Entries>(context_key_v2, new Time_Entries())
 }
 
 export function time_entry_context_use_v2 () {
-    const ctx = getContext<Time_Entries>(context_key_V2)
+    const ctx = getContext<Time_Entries>(context_key_v2)
     if (!ctx) {
         console.warn({ level: "warn", msg: "time entry context has not been initalized" })
     }
@@ -74,7 +74,7 @@ function create_time_entry (
 ) {
     const time_entry = new_time_entry2({
         start: start_date,
-        end: end_date,
+        end:   end_date,
         state: Time_Entry_State.In_Progress,
         project,
         task
@@ -96,7 +96,7 @@ function update_last_time_entry (time_entry: Time_Entry) {
 }
 
 export interface CMD_Update_Time_Entry_By_Index {
-    index: number
+    index:      number
     time_entry: Time_Entry
 }
 
@@ -130,7 +130,7 @@ function update_time_entry (index: number, time_entry: Time_Entry) {
 }
 
 export interface CMD_Update_Time_Entry_By_Id {
-    id: number
+    id:         number
     time_entry: Time_Entry
 }
 function update_time_entry_by_id_batch (cmds: CMD_Update_Time_Entry_By_Id[]) {
@@ -178,10 +178,4 @@ function delete_time_entry (id: number) {
     }
     time_entries.splice(index, 1)
     store_time_entry.set(time_entries)
-}
-
-function find_overlapping_time_entries (e: Time_Entry, time_entires: Time_Entry[]): Time_Entry[] {
-    const overlapping_time_entries: Time_Entry[] = time_entires.filter(time_entry => time_entry_overlap(e, time_entry))
-
-    return overlapping_time_entries
 }

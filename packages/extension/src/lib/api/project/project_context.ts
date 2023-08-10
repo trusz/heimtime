@@ -5,8 +5,8 @@ import type { Project } from "./project"
 
 interface Project_Context {
     store_projects: Writable<Project[]>
-    add_project: typeof add_project
-    set_projects: typeof set_projects
+    add_project:    typeof add_project
+    set_projects:   typeof set_projects
 }
 const context_key = {}
 

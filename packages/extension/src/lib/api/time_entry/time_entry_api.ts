@@ -6,8 +6,8 @@ import { new_time_entry2, type Time_Entry, Time_Entry_State } from "./time_entry
 
 export class Time_Entry_API {
     constructor (
-        public http: 		HTTP,
-        public base_url: 	string,
+        public http:        HTTP,
+        public base_url:    string,
         public employee_id: number
     ) {
         this.api_url = `employees/${employee_id}/trackedtimes`
@@ -80,35 +80,35 @@ export class Time_Entry_API {
 }
 
 interface Response_Tracked_Times {
-    id: number // employee id
-    types: Array<"WORKING_HOURS" | "PUBLIC_HOLIDAY">
-    firstName: string
-    lastName: string
-    lockStatus: { id: number } // 1=locked, 2=editable
-    projectIds: null
+    id:               number // employee id
+    types:            Array<"WORKING_HOURS" | "PUBLIC_HOLIDAY">
+    firstName:        string
+    lastName:         string
+    lockStatus:       { id: number } // 1=locked, 2=editable
+    projectIds:       null
     trackedTimesDate: Array<{
-        date: Date_ISO
+        date:                Date_ISO
         plannedWorkingHours: number
-        publicHoliday: null | string
+        publicHoliday:       null | string
         trackedTimes: Array<{
-            id: number
-            date: Date_ISO
+            id:       number
+            date:     Date_ISO
             employee: { id: number }
-            start: Time_String
-            end: Time_String
-            note: string // -> description
-            status: { id: 1 }
-            project: { id: number, name: string }
-            task: { id: number, name: string, isBillable: null }
-            type: "WORKING_HOURS" | "PUBLIC_HOLIDAY" | "FLEXIDAY"
+            start:    Time_String
+            end:      Time_String
+            note:     string // -> description
+            status:   { id: 1 }
+            project:  { id: number, name: string }
+            task:     { id: number, name: string, isBillable: null }
+            type:     "WORKING_HOURS" | "PUBLIC_HOLIDAY" | "FLEXIDAY"
         }>
     }>
 }
 
-const Time_Entry_Type = {
-    WORKING_HOURS: "WORKING_HOURS",
+const time_entry_type = {
+    WORKING_HOURS:  "WORKING_HOURS",
     PUBLIC_HOLIDAY: "PUBLIC_HOLIDAY",
-    FLEXIDAY: "FLEXIDAY"
+    FLEXIDAY:       "FLEXIDAY"
 } as const
 
 function time_entries_from_response (resp: Response_Tracked_Times): Time_Entry[] {
@@ -118,15 +118,15 @@ function time_entries_from_response (resp: Response_Tracked_Times): Time_Entry[]
     for (const ttd of resp.trackedTimesDate) {
         for (const tt of ttd.trackedTimes) {
             // debugger;
-            if (tt.type !== Time_Entry_Type.WORKING_HOURS) { continue }
+            if (tt.type !== time_entry_type.WORKING_HOURS) { continue }
 
             const time_entry = new_time_entry2({
-                id: tt.id,
-                start: new Date(`${tt.date} ${tt.start}`),
-                end: new Date(`${tt.date} ${tt.end}`),
-                state: Time_Entry_State.Stable,
-                project: new_project(tt.project.id, tt.project.name),
-                task: new_task(tt.task.id, tt.task.name),
+                id:          tt.id,
+                start:       new Date(`${tt.date} ${tt.start}`),
+                end:         new Date(`${tt.date} ${tt.end}`),
+                state:       Time_Entry_State.Stable,
+                project:     new_project(tt.project.id, tt.project.name),
+                task:        new_task(tt.task.id, tt.task.name),
                 description: tt.note
             })
             time_entires.push(time_entry)
@@ -136,47 +136,47 @@ function time_entries_from_response (resp: Response_Tracked_Times): Time_Entry[]
 }
 
 interface Post_Tracked_Times {
-    date: Date_ISO
-    employee: { id: number }
+    date:         Date_ISO
+    employee:     { id: number }
     trackedTimes: Array<{
         start: Time_String
-        end: Time_String
-        note: string
-        task: { id: number }
+        end:   Time_String
+        note:  string
+        task:  { id: number }
     }>
 }
 
 function time_entry_to_post_tracked_times (time_entry: Time_Entry, employee_id: number): Post_Tracked_Times {
     return {
-        date: date_format_iso(time_entry.start),
-        employee: { id: employee_id },
+        date:         date_format_iso(time_entry.start),
+        employee:     { id: employee_id },
         trackedTimes: [{
             start: date_format_time(time_entry.start),
-            end: date_format_time(time_entry.end),
-            note: time_entry.description ?? "",
-            task: { id: time_entry.task?.id }
+            end:   date_format_time(time_entry.end),
+            note:  time_entry.description ?? "",
+            task:  { id: time_entry.task?.id }
         }]
     }
 }
 
 interface Put_Tracked_Times {
-    date: Date_ISO
+    date:         Date_ISO
     trackedTimes: Array<{
         start: Time_String
-        end: Time_String
-        note: string
-        task: { id: number }
+        end:   Time_String
+        note:  string
+        task:  { id: number }
     }>
 }
 
 function time_entry_to_put_tracked_times (time_entry: Time_Entry): Put_Tracked_Times {
     return {
-        date: date_format_iso(time_entry.start),
+        date:         date_format_iso(time_entry.start),
         trackedTimes: [{
             start: date_format_time(time_entry.start),
-            end: date_format_time(time_entry.end),
-            note: time_entry.description ?? "",
-            task: { id: time_entry.task?.id }
+            end:   date_format_time(time_entry.end),
+            note:  time_entry.description ?? "",
+            task:  { id: time_entry.task?.id }
         }]
     }
 }

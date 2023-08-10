@@ -124,20 +124,6 @@ export class Time_Entries {
             })
         })
     }
-
-    // private update(id:number, update_parts:Partial<Time_Entry>){
-    // this._store.update( (time_entries) => {
-    // 		return time_entries.map( (te) => {
-    // 			if(te.id === id){
-    // 				return {
-    // 					...te,
-    // 					...update_parts,
-    // 				}
-    // 			}
-    // 			return te
-    // 		})
-    // 	})
-    // }
 }
 
 function derived_by_state (time_entries: Readable<Time_Entry[]>, state: Time_Entry_State): Readable<Time_Entry[]> {

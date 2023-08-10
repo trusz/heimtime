@@ -26,17 +26,16 @@ export class HTTP {
         return `Bearer ${this.jwt}`
     }
 
-    private async fetch<T>(method: Method, url: string, payload?: unknown): Promise<JSON_Response<T>> {
+    private async fetch<T extends Record<string, unknown>>(method: Method, url: string, payload?: unknown): Promise<JSON_Response<T>> {
         let body: string | undefined
         if (payload !== undefined) {
             body = JSON.stringify(payload)
         }
-        let resp: Response
-        resp = await fetch(url, {
+        const resp = await fetch(url, {
             method,
             headers: {
-                Authorization: this.Auth_Header(),
-                Accept: "application/json",
+                Authorization:  this.Auth_Header(),
+                Accept:         "application/json",
                 "content-type": "application/json;charset=UTF-8"
             },
             body
@@ -47,18 +46,18 @@ export class HTTP {
         }
 
         const body_text = await resp.text()
-        let json_body = {} as T
+        let json_body = {}
         try {
             json_body = JSON.parse(body_text) as T
         } catch (err) {
             console.warn({ level: "error", msg: "fetch: could not parse response to json", err, body_text })
         }
 
-        const typedResponse = {
+        const typed_response = {
             ...resp,
             body: json_body
         }
 
-        return typedResponse
+        return typed_response
     }
 }

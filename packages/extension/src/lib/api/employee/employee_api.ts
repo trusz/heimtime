@@ -3,8 +3,8 @@ import { Employee } from "./employee"
 
 export class Employee_API {
     constructor (
-        public http: 		HTTP,
-        public base_url: 	string
+        public http:     HTTP,
+        public base_url: string
     ) {
         this.api_url = "employees"
     }
@@ -13,12 +13,7 @@ export class Employee_API {
 
     public async fetch_employee (emp_id: number): Promise<Employee> {
         const url = this.url_employee(emp_id)
-        let resp: JSON_Response<Response_Employee>
-        try {
-            resp = await this.http.get<Response_Employee>(url)
-        } catch (err) {
-            throw err
-        }
+        const resp: JSON_Response<Response_Employee> = await this.http.get<Response_Employee>(url)
 
         const emp = employee_from_response(resp.body)
         return emp
@@ -32,16 +27,16 @@ export class Employee_API {
 }
 
 interface Response_Employee {
-    id: number
+    id:        number
     firstName: string
-    lastName: string
+    lastName:  string
 }
 
 function employee_from_response (resp: Response_Employee): Employee {
     const emp = new Employee({
-        id: resp.id,
+        id:         resp.id,
         first_name: resp.firstName,
-        last_name: resp.lastName
+        last_name:  resp.lastName
     })
 
     return emp

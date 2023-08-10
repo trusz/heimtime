@@ -5,8 +5,8 @@ import type { Task } from "./task"
 
 export class Project_API {
     constructor (
-        public http: 		HTTP,
-        public base_url: 	string,
+        public http:        HTTP,
+        public base_url:    string,
         public employee_id: number
     ) {
         this.api_url = `employees/${employee_id}/projects`
@@ -32,10 +32,10 @@ export class Project_API {
 
 interface Response_Project {
     projects: Array<{
-        id: number
-        name: string
+        id:    number
+        name:  string
         tasks: Array<{
-            id: number
+            id:   number
             name: string
         }>
     }>
@@ -46,13 +46,13 @@ function projects_from_response (resp: Response_Project): Project[] {
 
     for (const p of resp.projects) {
         const new_project: Project = {
-            id: p.id,
-            name: p.name,
+            id:    p.id,
+            name:  p.name,
             tasks: []
         }
         for (const t of p.tasks) {
             const new_task: Task = {
-                id: t.id,
+                id:   t.id,
                 name: t.name
             }
             new_project.tasks.push(new_task)
