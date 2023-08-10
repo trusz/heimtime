@@ -1,19 +1,19 @@
 module.exports = {
     "env": {
         "browser": true,
-        "es2021":  true
+        "es2021":  true,
     },
     "overrides": [
         {
             "env": {
-                "node": true
+                "node": true,
             },
             "files": [
-                ".eslintrc.{js,cjs}"
+                ".eslintrc.{js,cjs}",
             ],
             "parserOptions": {
                 "sourceType": "script",
-            }
+            },
         },
     ],
     "parserOptions": {
@@ -27,6 +27,7 @@ module.exports = {
         semi:              ["error", "never"],
         "key-spacing":     ["error", { "align": "value" }],
         "no-multi-spaces": "off",
+        "comma-dangle":    ["error", "always-multiline"],
         // This does not want to work for interfaces
         // so I have to disable it ^
         // "no-multi-spaces": [

@@ -135,7 +135,6 @@
 
     $: load_events($store)
     function load_events(time_entires: Time_Entry[]){
-        console.log({level:"dev", message: "load_events", time_entires})
         const new_events = time_entires.map(time_entry_to_event)
 
         if(!ec){ return }
@@ -150,7 +149,6 @@
         if(color_hash === ""){
             color = "var(--color-grey-2)"
         }
-        console.log({level:"dev", message: "color_hash", te, color_hash, color, color2: string_to_color(color_hash)})
 
         return {
             id: String(te.id),
@@ -203,7 +201,6 @@
     }
 
     function handle_select(info: SelectInfo) {
-        console.log({level:"dev", msg:"handle_select", info, events: ec.getEvents()})
         time_entires.reset_selected_time_entry()
         time_entires.create_time_entry({
 			start: info.start,

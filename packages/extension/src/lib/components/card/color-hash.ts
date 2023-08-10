@@ -33,7 +33,6 @@ export function string_to_color (str: string): string {
     const color_rgb2 = hsv_to_rgb(color_hsv.h, color_hsv.s, color_hsv.v)
     const color_hex2 = rgb_to_hex(color_rgb2.r, color_rgb2.g, color_rgb2.b)
 
-    // console.log({level:"dev", msg:"color transform", color_hex, color_rgb, color_hsv, color_rgb2, color_hex2})
 
     const colour = "#" + color_hex2
     return colour

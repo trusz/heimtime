@@ -29,6 +29,7 @@ module.exports = {
         "@typescript-eslint/key-spacing": ["error", { "align": "value" }],
         "@typescript-eslint/strict-boolean-expressions": "off",
         "@typescript-eslint/array-type": ["error", { "default": "array" }],
+        "@typescript-eslint/comma-dangle": ["error", "always-multiline"],
         "@typescript-eslint/no-misused-promises": [
             "error",
             { 

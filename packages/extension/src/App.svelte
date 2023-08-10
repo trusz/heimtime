@@ -29,10 +29,8 @@
     // 
     context_api_create()
     let api = context_api_get()
-    console.log({level:"dev", msg:"app.svelte set base url", base_url})
     api.set_base_url(base_url)
 
-    console.log({level:"dev", msg:"app.svelte set jwt", jwt})
     if(jwt && jwt !== ""){
         api.jwt_set(jwt)
     }

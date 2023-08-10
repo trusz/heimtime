@@ -49,7 +49,7 @@
 	function handle_submit(){	
 		const detail: Event_Save = {
 			task: new_selected_task,
-			description: new_description,
+			description: new_description ?? "", 
 		}
 		console.log({level:"dev", msg:"submitting", detail })
 		dispatch("save", detail)

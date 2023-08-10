@@ -2,8 +2,14 @@ import { get } from "svelte/store"
 import { init_project_context, new_project, new_task, type Task, type Project, context_project_use, context_project_init } from "../../api/project"
 import { time_entry_context_init_v2, time_entry_context_use_v2, Time_Entry_State, type Time_Entry } from "../../api/time_entry"
 import { date_format_iso, date_add_days } from "../../api/x/date"
+import { Mutex } from "../../api/x/mutex"
+
+const mtx_save = new Mutex()
+// let inited = false
 
 export function init_mocks () {
+    // if (inited) { return }
+    // inited = true
     //
     // Context
     //
@@ -21,7 +27,9 @@ export function init_mocks () {
     // API Mocks
     //
     time_entries.store_to_save.subscribe(async (time_entries_to_save: Time_Entry[]) => {
-        // console.log({level: "dev", msg: "entries to save", time_entries_to_save})
+        console.log({ level: "dev", msg: "entries to save", time_entries_to_save: time_entries_to_save.length })
+        if (time_entries_to_save.length === 0) { return }
+        // await mtx_save.lock()
         await Promise.all(
             time_entries_to_save.map(async (te) => {
                 await new Promise(resolve => setTimeout(resolve, 2_000))
@@ -30,7 +38,6 @@ export function init_mocks () {
 
                 const projects = get(ctx_projects.store).get(date) ?? []
                 const project = find_project_of_task(te.task, projects)
-                console.log({ level: "dev", msg: "syncing task with project",  project, projects, date, te })
                 time_entries.delete(te.id)
                 time_entries.create_time_entry({
                     ...te,
@@ -52,6 +59,7 @@ export function init_mocks () {
         //     })
         //     // time_entries.set_state(te.id, Time_Entry_State.Stable)
         // }
+        // await mtx_save.unlock()
     })
 
     time_entries.store_to_delete.subscribe(async (time_entries_to_delete: Time_Entry[]) => {

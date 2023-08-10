@@ -1,11 +1,15 @@
 import type { API } from "./api"
 import { time_entry_context_use_v2, type Time_Entry, type CMD_Update_Time_Entry_By_Id, time_entry_execute_action, Time_Entry_Action } from "./api/time_entry"
 import { date_first_day_of_week } from "./api/x/date"
+import { Mutex } from "./api/x/mutex"
+
+const mtx_save = new Mutex()
 
 export function time_entry_sync (api: API): void {
     const ctx_time_entries = time_entry_context_use_v2()
 
     ctx_time_entries.store_to_save.subscribe(async (time_entries_to_save: Time_Entry[]) => {
+        await mtx_save.lock()
         if (time_entries_to_save.length === 0) { return }
 
         // const update_cmds: CMD_Update_Time_Entry_By_Id[] = []
@@ -36,6 +40,7 @@ export function time_entry_sync (api: API): void {
         for (const te of saved_time_entires) {
             ctx_time_entries.create_time_entry(te)
         }
+        await mtx_save.unlock()
     })
 
     ctx_time_entries.store_to_delete.subscribe(async (time_entries_to_delete: Time_Entry[]): Promise<void> => {
