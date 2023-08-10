@@ -14,7 +14,7 @@ export class Projects {
 
     public create_project (date: Date_ISO, project: Project) {
         this._store.update((projects) => {
-            const projects_for_date = (projects.get(date) != null) || []
+            const projects_for_date = projects.get(date) ?? []
             return projects.set(date, [...projects_for_date, project])
         })
     }
