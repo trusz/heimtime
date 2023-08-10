@@ -1,3 +1,3 @@
-export type Form_Item = {
-	name: string
+export interface Form_Item {
+  name: string
 }
