@@ -23,15 +23,24 @@ const time_entry_context = {
     last_time_entry,
     update_last_time_entry,
     update_time_entry,
-    update_time_entry_batch,
+    replace_time_entry_batch,
     update_time_entry_by_id,
-    update_time_entry_by_id_batch,
+    replace_time_entry_by_id_batch,
     delete_time_entry,
-    delete_time_entry_batch
+    delete_time_entry_batch,
 }
 export type Time_Entry_Context = typeof time_entry_context
 const context_key = {}
 const context_key_v2 = {}
+
+export interface CMD_Update_Time_Entry_By_Id {
+    id:         number
+    time_entry: Partial<Time_Entry>
+}
+export interface CMD_Replace_Time_Entry_By_Id {
+    id:         number
+    time_entry: Time_Entry
+}
 
 export function time_entry_context_init () {
     setContext<Time_Entry_Context>(context_key, time_entry_context)
@@ -70,14 +79,14 @@ function create_time_entry (
     start_date: Date,
     end_date: Date,
     project?: Project,
-    task?: Task
+    task?: Task,
 ) {
     const time_entry = new_time_entry2({
         start: start_date,
         end:   end_date,
         state: Time_Entry_State.In_Progress,
         project,
-        task
+        task,
     })
 
     const time_entries = get(store_time_entry)
@@ -95,12 +104,12 @@ function update_last_time_entry (time_entry: Time_Entry) {
     update_time_entry(time_entries.length - 1, time_entry)
 }
 
-export interface CMD_Update_Time_Entry_By_Index {
+export interface CMD_Replace_Time_Entry_By_Index {
     index:      number
     time_entry: Time_Entry
 }
 
-function update_time_entry_batch (cmds: CMD_Update_Time_Entry_By_Index[]): void {
+function replace_time_entry_batch (cmds: CMD_Replace_Time_Entry_By_Index[]): void {
     const time_entries = get(store_time_entry)
 
     for (const { index, time_entry } of cmds) {
@@ -129,22 +138,18 @@ function update_time_entry (index: number, time_entry: Time_Entry) {
     store_time_entry.set(time_entries)
 }
 
-export interface CMD_Update_Time_Entry_By_Id {
-    id:         number
-    time_entry: Time_Entry
-}
-function update_time_entry_by_id_batch (cmds: CMD_Update_Time_Entry_By_Id[]) {
+function replace_time_entry_by_id_batch (cmds: CMD_Replace_Time_Entry_By_Id[]) {
     const time_entries = get(store_time_entry)
-    const new_cmds: CMD_Update_Time_Entry_By_Index[] = []
+    const new_cmds: CMD_Replace_Time_Entry_By_Index[] = []
     for (const { id, time_entry } of cmds) {
         const index = time_entries.findIndex(te => te.id === id)
         new_cmds.push({
             index,
-            time_entry
+            time_entry,
         })
     }
 
-    update_time_entry_batch(new_cmds)
+    replace_time_entry_batch(new_cmds)
 }
 function update_time_entry_by_id (id: number, time_entry: Time_Entry) {
     const time_entries = get(store_time_entry)

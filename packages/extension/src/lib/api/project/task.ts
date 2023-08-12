@@ -6,6 +6,6 @@ export interface Task {
 export function new_task (id: number, name: string): Task {
     return {
         id,
-        name
+        name,
     }
 }

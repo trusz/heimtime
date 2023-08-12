@@ -1,12 +1,17 @@
-import type { API } from "./api"
-import { time_entry_context_use_v2, type Time_Entry, type CMD_Update_Time_Entry_By_Id, time_entry_execute_action, Time_Entry_Action } from "./api/time_entry"
-import { date_first_day_of_week } from "./api/x/date"
-import { Mutex } from "./api/x/mutex"
+// import type { API } from "./api"
+import { type API } from "./api"
+import { type Time_Entry, type CMD_Replace_Time_Entry_By_Id, time_entry_execute_action, Time_Entry_Action } from "../time_entry"
+import { date_first_day_of_week } from "../x/date"
+import { Mutex } from "../x/mutex"
+import { type CTX_Time_Entries } from "./ctx_time_entries"
 
 const mtx_save = new Mutex()
 
-export function time_entry_sync (api: API): void {
-    const ctx_time_entries = time_entry_context_use_v2()
+export function time_entry_sync (
+    api: API,
+    ctx_time_entries: CTX_Time_Entries,
+): void {
+    // const ctx_time_entries = time_entry_context_use_v2()
 
     ctx_time_entries.store_to_save.subscribe(async (time_entries_to_save: Time_Entry[]) => {
         await mtx_save.lock()
@@ -46,7 +51,7 @@ export function time_entry_sync (api: API): void {
     ctx_time_entries.store_to_delete.subscribe(async (time_entries_to_delete: Time_Entry[]): Promise<void> => {
         if (time_entries_to_delete.length === 0) { return }
 
-        const update_cmds: CMD_Update_Time_Entry_By_Id[] = []
+        const update_cmds: CMD_Replace_Time_Entry_By_Id[] = []
         const delete_promises = time_entries_to_delete.map(async (te) => {
             const is_on_server = te.id > 0
             if (is_on_server) {
@@ -63,7 +68,7 @@ export function time_entry_sync (api: API): void {
                 const errd_te = time_entry_execute_action(te, Time_Entry_Action.Save_Error)
                 update_cmds.push({
                     id:         te.id,
-                    time_entry: errd_te
+                    time_entry: errd_te,
                 })
             } else {
                 deleted_ids.push(te.id)
@@ -86,6 +91,6 @@ function find_week_range (d: Date): { start: Date, end: Date } {
 
     return {
         start,
-        end
+        end,
     }
 }

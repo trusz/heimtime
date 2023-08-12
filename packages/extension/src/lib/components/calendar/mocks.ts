@@ -42,10 +42,10 @@ export function init_mocks () {
                 time_entries.create_time_entry({
                     ...te,
                     state: Time_Entry_State.Stable,
-                    project
+                    project,
                 })
             // time_entries.set_state(te.id, Time_Entry_State.Stable)
-            })
+            }),
         )
         // for (const te of time_entries_to_save) {
         //     // sync task with project
@@ -79,27 +79,27 @@ export function init_mocks () {
 
     ctx_projects.create_project(
         yesterday,
-        new_project(0, "first", [new_task(0, "1.1"), new_task(1, "1.2"), new_task(2, "1.3")])
+        new_project(0, "first", [new_task(0, "1.1"), new_task(1, "1.2"), new_task(2, "1.3")]),
     )
     ctx_projects.create_project(
         yesterday,
-        new_project(1, "second", [new_task(3, "2.1"), new_task(4, "2.2"), new_task(5, "2.3")])
+        new_project(1, "second", [new_task(3, "2.1"), new_task(4, "2.2"), new_task(5, "2.3")]),
     )
     ctx_projects.create_project(
         today,
-        new_project(2, "first", [new_task(0, "1.1"), new_task(1, "1.2"), new_task(2, "1.3")])
+        new_project(2, "first", [new_task(0, "1.1"), new_task(1, "1.2"), new_task(2, "1.3")]),
     )
     ctx_projects.create_project(
         today,
-        new_project(3, "second", [new_task(3, "2.1"), new_task(4, "2.2"), new_task(5, "2.3")])
+        new_project(3, "second", [new_task(3, "2.1"), new_task(4, "2.2"), new_task(5, "2.3")]),
     )
     ctx_projects.create_project(
         tomorrow,
-        new_project(4, "first", [new_task(0, "1.1"), new_task(1, "1.2"), new_task(2, "1.3")])
+        new_project(4, "first", [new_task(0, "1.1"), new_task(1, "1.2"), new_task(2, "1.3")]),
     )
     ctx_projects.create_project(
         tomorrow,
-        new_project(5, "second", [new_task(3, "2.1"), new_task(4, "2.2"), new_task(5, "2.3")])
+        new_project(5, "second", [new_task(3, "2.1"), new_task(4, "2.2"), new_task(5, "2.3")]),
     )
     const yesterday_projects = get(ctx_projects.store).get(yesterday) ?? []
     const today_projects = get(ctx_projects.store).get(today) ?? []
@@ -111,7 +111,7 @@ export function init_mocks () {
         project:     today_projects[0],
         task:        today_projects[0].tasks[0],
         state:       Time_Entry_State.Saving,
-        description: "this was already here (today)"
+        description: "this was already here (today)",
     })
 
     time_entries.create_time_entry({
@@ -120,7 +120,7 @@ export function init_mocks () {
         project:     tomorrow_projects[1],
         task:        tomorrow_projects[1].tasks[1],
         state:       Time_Entry_State.Stable,
-        description: "this was already here (tomorrow)"
+        description: "this was already here (tomorrow)",
     })
     time_entries.create_time_entry({
         start:       new Date(yesterday + " 12:00"),
@@ -128,7 +128,7 @@ export function init_mocks () {
         project:     yesterday_projects[1],
         task:        yesterday_projects[1].tasks[1],
         state:       Time_Entry_State.Stable,
-        description: "this was already here (yesterday)"
+        description: "this was already here (yesterday)",
     })
 }
 

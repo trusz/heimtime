@@ -19,6 +19,10 @@ export class Time_Entries {
         this._store.set([])
     }
 
+    /**
+     * Selects a single time entry
+     * and deselects any previously selected ones
+     */
     public select_time_entry (id: number) {
         this._store.update((time_entries) => {
             return time_entries.map((te) => {
@@ -30,6 +34,10 @@ export class Time_Entries {
         })
     }
 
+    /**
+     * Selects additional time entries
+     * wihout deselecting any previously selected ones
+     */
     public select_additional_time_entry (id: number) {
         this._store.update((time_entries) => {
             return time_entries.map((te) => {
@@ -49,7 +57,7 @@ export class Time_Entries {
         })
     }
 
-    public set_state (id: number, state: Time_Entry_State) {
+    private set_state (id: number, state: Time_Entry_State) {
         this._store.update((time_entries) => {
             return time_entries.map((te) => {
                 if (te.id === id) {
@@ -64,6 +72,20 @@ export class Time_Entries {
         this.set_state(id, Time_Entry_State.Deleting)
     }
 
+    public flag_to_save (id: number) {
+        this._store.update((time_entries) => {
+            return time_entries.map((te) => {
+                if (te.id === id) {
+                    return {
+                        ...te,
+                        state: Time_Entry_State.Saving,
+                    }
+                }
+                return te
+            })
+        })
+    }
+
     public delete (id: number) {
         this._store.update((time_entries) => {
             return time_entries.filter((te) => te.id !== id)
@@ -76,37 +98,23 @@ export class Time_Entries {
         })
     }
 
+    public set_time_range (id: number, start?: Date, end?: Date) {
+        this.update_by_id(id, { start, end })
+        this.flag_to_save(id)
+    }
+
     public update_by_id (id: number, time_entry: Partial<Time_Entry>) {
         this._store.update((time_entries) => {
             return time_entries.map((te) => {
                 if (te.id === id) {
                     return {
                         ...te,
-                        ...time_entry
+                        ...time_entry,
                     }
                 }
                 return te
             })
         })
-    }
-
-    public flag_to_save (id: number) {
-        this._store.update((time_entries) => {
-            return time_entries.map((te) => {
-                if (te.id === id) {
-                    return {
-                        ...te,
-                        state: Time_Entry_State.Saving
-                    }
-                }
-                return te
-            })
-        })
-    }
-
-    public set_time_range (id: number, start?: Date, end?: Date) {
-        this.update_by_id(id, { start, end })
-        this.flag_to_save(id)
     }
 
     public update_by_batch (cmds: CMD_Update_Time_Entry_By_Id[]) {
@@ -117,7 +125,7 @@ export class Time_Entries {
                     return {
                         ...te,
                         ...cmd.time_entry,
-                        state: Time_Entry_State.Stable
+                        // state: Time_Entry_State.Stable,
                     }
                 }
                 return te

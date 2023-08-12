@@ -30,6 +30,7 @@ module.exports = {
         "@typescript-eslint/strict-boolean-expressions": "off",
         "@typescript-eslint/array-type": ["error", { "default": "array" }],
         "@typescript-eslint/comma-dangle": ["error", "always-multiline"],
+        "@typescript-eslint/consistent-type-definitions": "off",
         "@typescript-eslint/no-misused-promises": [
             "error",
             { 

@@ -7,7 +7,7 @@
   	import { time_entry_context_init_v2, time_entry_context_use_v2 } from "./lib/api/time_entry";
   	import { date_add_days, date_format_iso } from "./lib/api/x/date";
     import { type Date_Changed_Info, Calendar } from "./lib/components/calendar";
-  	import { time_entry_sync } from "./lib/time_entry_sync";
+  	import { time_entry_sync } from "./lib/api/time_entry_sync/time_entry_sync";
 	import { Theme } from "./lib/components/theme"
 	
 	// 
