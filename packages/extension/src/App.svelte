@@ -4,11 +4,12 @@
   	import { context_api_create, context_api_get } from "./lib/api";
     import { Auth_Module } from "./lib/api/auth";
   	import { type Project, context_project_init, context_project_use } from "./lib/api/project";
-  	import { time_entry_context_init_v2, time_entry_context_use_v2 } from "./lib/api/time_entry";
+
   	import { date_add_days, date_format_iso } from "./lib/api/x/date";
     import { type Date_Changed_Info, Calendar } from "./lib/components/calendar";
   	import { time_entry_sync } from "./lib/api/time_entry_sync/time_entry_sync";
 	import { Theme } from "./lib/components/theme"
+    import { time_entries_context_init, time_entries_context_use } from "./lib/api/time_entry/time_entries_context";
 	
 	// 
 	// Config
@@ -43,8 +44,8 @@
     const cssURL = new URL("style.css", baseURL)
     const styleURL = cssURL.toString()
     
-	time_entry_context_init_v2()
-	const ctx_time_entires = time_entry_context_use_v2()
+	time_entries_context_init()
+	const ctx_time_entires = time_entries_context_use()
 
 	context_project_init()
 	const ctx_projects = context_project_use()
@@ -54,7 +55,7 @@
 	$: load_project_sets(date_start, date_end)
 	$: load_time_entires(date_start, date_end)
 	
-	time_entry_sync(api)
+	time_entry_sync(api, ctx_time_entires)
 
 	
 	// 

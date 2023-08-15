@@ -1,11 +1,31 @@
+/**
+ * @param date
+ * @returns date formated as "hh:MM" eg. 12:37
+ */
 export const date_format_time = Intl.DateTimeFormat("de-DE", { timeStyle: "short" }).format
 export const date_format_date_local = Intl.DateTimeFormat("de-DE", { dateStyle: "short" }).format
 
+/**
+ *
+ * @param date
+ * @returns date formated as ISO string eg. 2021-01-01
+ */
 export function date_format_iso (date: Date): string {
     const year = date.getFullYear()
     const month = String(date.getMonth() + 1).padStart(2, "0")
     const day = String(date.getDate()).padStart(2, "0")
     return `${year}-${month}-${day}`
+}
+
+/**
+ *
+ * @param date
+ * @returns date formated as ISO string eg. "2021-01-01 12:37"
+ */
+export function date_formate_date_time_iso (date: Date): string {
+    const date_iso = date_format_iso(date)
+    const time_iso = date_format_time(date)
+    return `${date_iso} ${time_iso}`
 }
 
 export function date_week_frames (date = new Date()): [start: Date, end:Date] {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { Time_Entries } from "./time_entry_store"
+import { Time_Entries } from "./time_entries"
 import { Time_Entry_State, type Time_Entry } from "./time_entry"
 import { get } from "svelte/store"
 // import { Time_Entry_Action, time_entry_execute_action, Time_Entry_State, type Time_Entry } from "./time_entry"
@@ -105,10 +105,10 @@ describe("time_entries", () => {
             ],
             expected_time_entries_in_store: [
                 make_time_entry({ id: 1 }),
-                make_time_entry({ id: 2, state: Time_Entry_State.Saving  }),
+                make_time_entry({ id: 2, state: Time_Entry_State.ToSave  }),
             ],
             expected_time_entries_in_store_to_save: [
-                make_time_entry({ id: 2, state: Time_Entry_State.Saving  }),
+                make_time_entry({ id: 2, state: Time_Entry_State.ToSave  }),
             ],
         },
         {
@@ -123,10 +123,10 @@ describe("time_entries", () => {
             ],
             expected_time_entries_in_store: [
                 make_time_entry({ id: 1 }),
-                make_time_entry({ id: 2, state: Time_Entry_State.Deleting  }),
+                make_time_entry({ id: 2, state: Time_Entry_State.ToDelete  }),
             ],
             expected_time_entries_in_store_to_delete: [
-                make_time_entry({ id: 2, state: Time_Entry_State.Deleting  }),
+                make_time_entry({ id: 2, state: Time_Entry_State.ToDelete  }),
             ],
         },
         {
@@ -214,7 +214,7 @@ describe("time_entries", () => {
                     id:    1,
                     start: new Date("2000-01-01 13:37"),
                     end:   new Date("2000-01-01 14:37"),
-                    state: Time_Entry_State.Saving,
+                    state: Time_Entry_State.ToSave,
                 }),
             ],
             expected_time_entries_in_store_to_save: [
@@ -222,9 +222,61 @@ describe("time_entries", () => {
                     id:    1,
                     start: new Date("2000-01-01 13:37"),
                     end:   new Date("2000-01-01 14:37"),
-                    state: Time_Entry_State.Saving,
+                    state: Time_Entry_State.ToSave,
                 }),
             ],
+        },
+        {
+            desc: "update an entry by time range",
+
+            time_entries_to_create: [
+                make_time_entry({
+                    id:          1,
+                    description: "this will be updated",
+                    start:       new Date("2006-07-13 08:00"),
+                    end:         new Date("2006-07-13 10:00"),
+                }),
+                make_time_entry({
+                    id:          2,
+                    description: "this is to make sure we not just replace everything",
+                    start:       new Date("2006-07-14 14:00"),
+                    end:         new Date("2006-07-14 15:00"),
+                }),
+            ],
+            actions: [
+                (tes) => {
+                    tes.replace_time_entries_by_time_range([
+                        make_time_entry({
+                            id:          101,
+                            description: "this will be updated",
+                            start:       new Date("2006-07-13 08:00"),
+                            end:         new Date("2006-07-13 10:00"),
+                        }),
+                    ])
+                },
+            ],
+            expected_time_entries_in_store: [
+                make_time_entry({
+                    id:          101,
+                    description: "this will be updated",
+                    start:       new Date("2006-07-13 08:00"),
+                    end:         new Date("2006-07-13 10:00"),
+                }),
+                make_time_entry({
+                    id:          2,
+                    description: "this is to make sure we not just replace everything",
+                    start:       new Date("2006-07-14 14:00"),
+                    end:         new Date("2006-07-14 15:00"),
+                }),
+            ],
+            // expected_time_entries_in_store_to_save: [
+            //     make_time_entry({
+            //         id:    1,
+            //         start: new Date("2000-01-01 13:37"),
+            //         end:   new Date("2000-01-01 14:37"),
+            //         state: Time_Entry_State.ToSave,
+            //     }),
+            // ],
         },
 
     ]
@@ -242,19 +294,19 @@ describe("time_entries", () => {
             actions.forEach((action) => { action(tes) })
 
             // Assert
-            const all_time_entries = get(tes.store)
+            const all_time_entries = get(tes.entries$)
             expect(all_time_entries).toHaveLength(tc.expected_time_entries_in_store.length)
             tc.expected_time_entries_in_store.forEach((expected_te) => {
                 expect(all_time_entries).toContainEqual(expected_te)
             })
 
-            const time_entries_to_save = get(tes.store_to_save)
+            const time_entries_to_save = get(tes.entries_to_save$)
             expect(time_entries_to_save).toHaveLength(tc.expected_time_entries_in_store_to_save?.length ?? 0)
             tc.expected_time_entries_in_store_to_save?.forEach((expected_te) => {
                 expect(time_entries_to_save).toContainEqual(expected_te)
             })
 
-            const time_entries_to_delete = get(tes.store_to_delete)
+            const time_entries_to_delete = get(tes.entries_to_delete$)
             expect(time_entries_to_delete).toHaveLength(tc.expected_time_entries_in_store_to_delete?.length ?? 0)
             tc.expected_time_entries_in_store_to_delete?.forEach((expected_te) => {
                 expect(time_entries_to_delete).toContainEqual(expected_te)

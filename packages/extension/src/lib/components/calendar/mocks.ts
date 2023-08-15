@@ -1,8 +1,9 @@
 import { get } from "svelte/store"
 import { init_project_context, new_project, new_task, type Task, type Project, context_project_use, context_project_init } from "../../api/project"
-import { time_entry_context_init_v2, time_entry_context_use_v2, Time_Entry_State, type Time_Entry } from "../../api/time_entry"
+import { Time_Entry_State, type Time_Entry } from "../../api/time_entry"
 import { date_format_iso, date_add_days } from "../../api/x/date"
 import { Mutex } from "../../api/x/mutex"
+import { time_entries_context_init, time_entries_context_use } from "../../api/time_entry/time_entries_context"
 
 const mtx_save = new Mutex()
 // let inited = false
@@ -13,11 +14,11 @@ export function init_mocks () {
     //
     // Context
     //
-    time_entry_context_init_v2()
+    time_entries_context_init()
     init_project_context()
     context_project_init()
     const ctx_projects = context_project_use()
-    const time_entries = time_entry_context_use_v2()
+    const time_entries = time_entries_context_use()
 
     //
     // Setup
@@ -26,7 +27,7 @@ export function init_mocks () {
     //
     // API Mocks
     //
-    time_entries.store_to_save.subscribe(async (time_entries_to_save: Time_Entry[]) => {
+    time_entries.entries_to_save$.subscribe(async (time_entries_to_save: Time_Entry[]) => {
         console.log({ level: "dev", msg: "entries to save", time_entries_to_save: time_entries_to_save.length })
         if (time_entries_to_save.length === 0) { return }
         // await mtx_save.lock()
@@ -62,7 +63,7 @@ export function init_mocks () {
         // await mtx_save.unlock()
     })
 
-    time_entries.store_to_delete.subscribe(async (time_entries_to_delete: Time_Entry[]) => {
+    time_entries.entries_to_delete$.subscribe(async (time_entries_to_delete: Time_Entry[]) => {
         await new Promise(resolve => setTimeout(resolve, 2_000))
         for (const te of time_entries_to_delete) {
             time_entries.delete(te.id)
@@ -110,7 +111,7 @@ export function init_mocks () {
         end:         new Date(today + " 09:30"),
         project:     today_projects[0],
         task:        today_projects[0].tasks[0],
-        state:       Time_Entry_State.Saving,
+        state:       Time_Entry_State.ToSave,
         description: "this was already here (today)",
     })
 

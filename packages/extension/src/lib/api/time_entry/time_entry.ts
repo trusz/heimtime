@@ -1,15 +1,29 @@
 import type { Project, Task } from "../project"
 import { defaults } from "lodash"
 
-export interface Time_Entry {
-    id:           number
-    start:        Date
-    end:          Date
-    state:        Time_Entry_State
-    project?:     Project
-    task?:        Task
-    description?: string
-    is_selected:  boolean
+export class Time_Entry {
+    public id:           number            = -1 * (Math.random() * 10000 | 0)
+    public start:        Date              = new Date()
+    public end:          Date              = new Date()
+    public state:        Time_Entry_State  = Time_Entry_State.In_Progress
+    public project?:     Project           = undefined
+    public task?:        Task              = undefined
+    public description?: string            = undefined
+    public is_selected:  boolean           = false
+
+    constructor (time_entry?: Partial<Time_Entry>) {
+        const new_this: Time_Entry = {
+            ...structuredClone(this),
+            ...time_entry,
+        }
+        Object.setPrototypeOf(new_this, Time_Entry.prototype)
+        return new_this
+    }
+
+    public static Is_Same_Range (a: Time_Entry, b: Time_Entry): boolean {
+        return a.start.getTime() === b.start.getTime() &&
+               a.end.getTime() === b.end.getTime()
+    }
 }
 
 function time_entry_default (): Time_Entry {
@@ -43,6 +57,12 @@ export function new_time_entry (
         is_selected,
     }
 }
+
+/**
+ * @deprecated use the contructor instead
+ * @param time_entry
+ * @returns
+ */
 export function new_time_entry2 (
     time_entry: Partial<Time_Entry>,
 ): Time_Entry {
@@ -92,20 +112,24 @@ export function slot_to_minutes (
 
 export enum Time_Entry_State {
     In_Progress = "In_Progress",
-    Saving      = "Saving",
     Error       = "Error",
+    ToSave      = "ToSave",
+    Saving      = "Saving",
     Stable      = "Stable",
+    ToDelete    = "ToSDelete",
     Deleting    = "Deleting",
 }
 
 export enum Time_Entry_Action {
     Creation_Progression = "Creation_Progression",
-    Form_Changes = "Form_Changes",
-    Form_Finished = "Form_Finished",
+    Form_Changes         = "Form_Changes",
+    Form_Finished        = "Form_Finished",
     Form_Or_Time_Changes = "Form_Or_Time_Changes",
     Save_Success         = "Save_Success",
     Save_Error           = "Save_Error",
     Delete               = "Delete",
+    Start_Saving         = "Start_Saving",
+    Start_Deleting       = "Start_Deleting",
 }
 
 type State_Machine = {
@@ -117,23 +141,34 @@ const state_machine: State_Machine = {
     [Time_Entry_State.In_Progress]: {
         [Time_Entry_Action.Creation_Progression]: Time_Entry_State.In_Progress,
         [Time_Entry_Action.Form_Changes]:         Time_Entry_State.In_Progress,
-        [Time_Entry_Action.Form_Finished]:        Time_Entry_State.Saving,
-        [Time_Entry_Action.Delete]:               Time_Entry_State.Deleting,
+        [Time_Entry_Action.Form_Finished]:        Time_Entry_State.ToSave,
+        [Time_Entry_Action.Delete]:               Time_Entry_State.ToDelete,
+    },
+    [Time_Entry_State.ToSave]: {
+        [Time_Entry_Action.Start_Saving]: Time_Entry_State.Saving,
+        [Time_Entry_Action.Save_Error]:   Time_Entry_State.Error,
+    },
+    [Time_Entry_State.ToDelete]: {
+        [Time_Entry_Action.Start_Deleting]: Time_Entry_State.Deleting,
+        [Time_Entry_Action.Save_Error]:     Time_Entry_State.Error,
+    },
+    [Time_Entry_State.Stable]: {
+        [Time_Entry_Action.Form_Finished]:        Time_Entry_State.ToSave,
+        [Time_Entry_Action.Delete]:               Time_Entry_State.ToDelete,
+        [Time_Entry_Action.Form_Or_Time_Changes]: Time_Entry_State.In_Progress,
+    },
+    [Time_Entry_State.Error]: {
+        [Time_Entry_Action.Form_Or_Time_Changes]: Time_Entry_State.In_Progress,
+        [Time_Entry_Action.Form_Finished]:        Time_Entry_State.ToSave,
+    },
+    [Time_Entry_State.Deleting]: {
+        [Time_Entry_Action.Save_Success]: Time_Entry_State.Stable,
+        [Time_Entry_Action.Save_Error]:   Time_Entry_State.Error,
     },
     [Time_Entry_State.Saving]: {
         [Time_Entry_Action.Save_Success]: Time_Entry_State.Stable,
         [Time_Entry_Action.Save_Error]:   Time_Entry_State.Error,
     },
-    [Time_Entry_State.Stable]: {
-        [Time_Entry_Action.Form_Finished]:        Time_Entry_State.Saving,
-        [Time_Entry_Action.Delete]:               Time_Entry_State.Deleting,
-        [Time_Entry_Action.Form_Or_Time_Changes]: Time_Entry_State.In_Progress,
-    },
-    [Time_Entry_State.Error]: {
-        [Time_Entry_Action.Form_Or_Time_Changes]: Time_Entry_State.In_Progress,
-        [Time_Entry_Action.Form_Finished]:        Time_Entry_State.Saving,
-    },
-    [Time_Entry_State.Deleting]: {},
 }
 
 export function time_entry_execute_action (

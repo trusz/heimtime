@@ -158,7 +158,7 @@ suite("time_entry", () => {
                 desc:           "Sate can change",
                 start_state:    Time_Entry_State.In_Progress,
                 action:         Time_Entry_Action.Form_Finished,
-                expected_state: Time_Entry_State.Saving,
+                expected_state: Time_Entry_State.ToSave,
             },
         ]
 

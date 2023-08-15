@@ -1,22 +1,21 @@
-import { writable, derived, type Readable } from "svelte/store"
-import { type Time_Entry, Time_Entry_State, new_time_entry2 } from "./time_entry"
-import { type CMD_Update_Time_Entry_By_Id } from "./time_entry_context"
+import { writable, derived, type Readable, get } from "svelte/store"
+import { Time_Entry, Time_Entry_State } from "./time_entry"
 
 export class Time_Entries {
-    private readonly _store = writable<Time_Entry[]>([])
-    public store = derived(this._store, (time_entries) => time_entries)
-    public store_to_save = derived_by_state(this._store, Time_Entry_State.Saving)
-    public store_to_delete = derived_by_state(this._store, Time_Entry_State.Deleting)
+    private readonly _entries$ = writable<Time_Entry[]>([])
+    public entries$ = derived(this._entries$, (time_entries) => time_entries)
+    public entries_to_save$ = derived_by_state(this._entries$, Time_Entry_State.ToSave)
+    public entries_to_delete$ = derived_by_state(this._entries$, Time_Entry_State.ToDelete)
 
     public create_time_entry (
         ...time_entries_to_create: Partial<Time_Entry>[]
     ) {
-        const new_time_entries = time_entries_to_create.map((te) => new_time_entry2(te))
-        this._store.update((time_entries) => [...time_entries, ...new_time_entries])
+        const new_time_entries = time_entries_to_create.map((te) => new Time_Entry(te))
+        this._entries$.update((time_entries) => [...time_entries, ...new_time_entries])
     }
 
     public clear () {
-        this._store.set([])
+        this._entries$.set([])
     }
 
     /**
@@ -24,7 +23,7 @@ export class Time_Entries {
      * and deselects any previously selected ones
      */
     public select_time_entry (id: number) {
-        this._store.update((time_entries) => {
+        this._entries$.update((time_entries) => {
             return time_entries.map((te) => {
                 if (te.id === id) {
                     return { ...te, is_selected: true }
@@ -39,7 +38,7 @@ export class Time_Entries {
      * wihout deselecting any previously selected ones
      */
     public select_additional_time_entry (id: number) {
-        this._store.update((time_entries) => {
+        this._entries$.update((time_entries) => {
             return time_entries.map((te) => {
                 if (te.id === id) {
                     return { ...te, is_selected: true }
@@ -50,7 +49,7 @@ export class Time_Entries {
     }
 
     public reset_selected_time_entry () {
-        this._store.update((time_entries) => {
+        this._entries$.update((time_entries) => {
             return time_entries.map((te) => {
                 return { ...te, is_selected: false }
             })
@@ -58,7 +57,7 @@ export class Time_Entries {
     }
 
     private set_state (id: number, state: Time_Entry_State) {
-        this._store.update((time_entries) => {
+        this._entries$.update((time_entries) => {
             return time_entries.map((te) => {
                 if (te.id === id) {
                     return { ...te, state }
@@ -69,16 +68,16 @@ export class Time_Entries {
     }
 
     public flag_to_delete (id: number) {
-        this.set_state(id, Time_Entry_State.Deleting)
+        this.set_state(id, Time_Entry_State.ToDelete)
     }
 
     public flag_to_save (id: number) {
-        this._store.update((time_entries) => {
+        this._entries$.update((time_entries) => {
             return time_entries.map((te) => {
                 if (te.id === id) {
                     return {
                         ...te,
-                        state: Time_Entry_State.Saving,
+                        state: Time_Entry_State.ToSave,
                     }
                 }
                 return te
@@ -87,13 +86,13 @@ export class Time_Entries {
     }
 
     public delete (id: number) {
-        this._store.update((time_entries) => {
+        this._entries$.update((time_entries) => {
             return time_entries.filter((te) => te.id !== id)
         })
     }
 
     public delete_batch (ids: number[]) {
-        this._store.update((time_entries) => {
+        this._entries$.update((time_entries) => {
             return time_entries.filter((te) => !ids.includes(te.id))
         })
     }
@@ -104,7 +103,7 @@ export class Time_Entries {
     }
 
     public update_by_id (id: number, time_entry: Partial<Time_Entry>) {
-        this._store.update((time_entries) => {
+        this._entries$.update((time_entries) => {
             return time_entries.map((te) => {
                 if (te.id === id) {
                     return {
@@ -118,7 +117,7 @@ export class Time_Entries {
     }
 
     public update_by_batch (cmds: CMD_Update_Time_Entry_By_Id[]) {
-        this._store.update((time_entries) => {
+        this._entries$.update((time_entries) => {
             return time_entries.map((te) => {
                 const cmd = cmds.find((cmd) => cmd.id === te.id)
                 if (cmd != null) {
@@ -132,8 +131,65 @@ export class Time_Entries {
             })
         })
     }
+
+    public replace_time_entries_by_id (cmds: CMD_Replace_Time_Entry_By_Id[]) {
+        const time_entries = get(this.entries$)
+        const new_cmds: CMD_Replace_Time_Entry_By_Index[] = []
+        for (const { id, time_entry } of cmds) {
+            const index = time_entries.findIndex(te => te.id === id)
+            new_cmds.push({
+                index,
+                time_entry,
+            })
+        }
+
+        this.replace_time_entries_by_index(new_cmds)
+    }
+
+    public replace_time_entries_by_index (cmds: CMD_Replace_Time_Entry_By_Index[]): void {
+        this._entries$.update((time_entries) => {
+            const new_time_entries = [...time_entries]
+            for (const { index, time_entry } of cmds) {
+                // fix time order
+                if (time_entry.start > time_entry.end) {
+                    [time_entry.end, time_entry.start] = [time_entry.start, time_entry.end]
+                }
+                new_time_entries[index] = time_entry
+            }
+            return new_time_entries
+        })
+    }
+
+    public replace_time_entries_by_time_range (time_entries_to_replace: Time_Entry[]) {
+        this._entries$.update((time_entries) => {
+            const new_time_entries = [...time_entries]
+
+            for (const time_entry of time_entries_to_replace) {
+                const index = time_entries.findIndex((te) => {
+                    return Time_Entry.Is_Same_Range(te, time_entry)
+                })
+                new_time_entries[index] = time_entry
+            }
+
+            return new_time_entries
+        })
+    }
 }
 
 function derived_by_state (time_entries: Readable<Time_Entry[]>, state: Time_Entry_State): Readable<Time_Entry[]> {
     return derived(time_entries, (time_entries) => time_entries.filter((e) => e.state === state))
+}
+
+export interface CMD_Update_Time_Entry_By_Id {
+    id:         number
+    time_entry: Partial<Time_Entry>
+}
+export interface CMD_Replace_Time_Entry_By_Id {
+    id:         number
+    time_entry: Time_Entry
+}
+
+export interface CMD_Replace_Time_Entry_By_Index {
+    index:      number
+    time_entry: Time_Entry
 }

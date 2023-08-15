@@ -5,18 +5,18 @@ const context_key = {}
 const no_selection = -Infinity
 
 export function context_time_entry_selection_init () {
-    setContext<Select_Context>(context_key, new Select_Context())
+    setContext<Selection_Context>(context_key, new Selection_Context())
 }
 
 export function context_time_entry_selection_use () {
-    const ctx = getContext<Select_Context>(context_key)
+    const ctx = getContext<Selection_Context>(context_key)
     if (!ctx) {
         console.warn({ level: "warn", msg: "selection context has not been initalized" })
     }
     return ctx
 }
 
-class Select_Context {
+export class Selection_Context {
     public selection_store: Writable<number> = writable(no_selection)
 
     //

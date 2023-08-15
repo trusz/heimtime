@@ -25,9 +25,10 @@
     import type { Event_Save } from '../event_form/events';
     import { createEventDispatcher } from 'svelte';
     import { context_project_use } from '../../api/project';
-    import { time_entry_context_use_v2, type Time_Entry, Time_Entry_State } from '../../api/time_entry';
+    import { type Time_Entry, Time_Entry_State } from '../../api/time_entry';
     import { date_format_iso, date_duration_in_minutes, date_minutes_to_hours_and_minutes } from '../../api/x/date';
     import type { Date_Changed_Info } from './datechanged';
+    import { time_entries_context_use } from '../../api/time_entry/time_entries_context';
 
     // 
     // Init
@@ -37,7 +38,7 @@
     // 
     // Context
     // 
-    const time_entires = time_entry_context_use_v2()
+    const time_entires = time_entries_context_use()
     const ctx_projects = context_project_use()
     $: project_sets = ctx_projects.store
     $: projects = $project_sets.get( date_format_iso( cur_time_entry?.start ?? new Date() ) ) ?? []
@@ -110,9 +111,9 @@
         const cssClasses = [
             { class: "stable",      condition: time_entry.state === Time_Entry_State.Stable},
             { class: "in-progress", condition: time_entry.state === Time_Entry_State.In_Progress},
-            { class: "saving",      condition: time_entry.state === Time_Entry_State.Saving},
+            { class: "saving",      condition: time_entry.state === Time_Entry_State.ToSave},
             { class: "error",       condition: time_entry.state === Time_Entry_State.Error},
-            { class: "deleting",    condition: time_entry.state === Time_Entry_State.Deleting},
+            { class: "deleting",    condition: time_entry.state === Time_Entry_State.ToDelete},
             { class: "selected",    condition: time_entry.is_selected},
 
         ].filter(c => c.condition)
@@ -131,7 +132,7 @@
     // #region event mapping
 
     let events: Event[] = []
-    const store = time_entires.store
+    const store = time_entires.entries$
 
     $: load_events($store)
     function load_events(time_entires: Time_Entry[]){
