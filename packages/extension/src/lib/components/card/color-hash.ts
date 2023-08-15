@@ -1,6 +1,9 @@
 /* eslint-disable */
 /* @ts-ignore */
-const DEFAULT_COLOR = "#f2f2f2"
+// This file is copied from https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
+// TODO: fix ts and eslint errors
+
+const DEFAULT_COLOR = "#f2f2f2" 
 
 // https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
 export function string_to_color (str: string): string {
@@ -45,7 +48,9 @@ export function string_to_color (str: string): string {
 * https://stackoverflow.com/a/17243070/21141047
 */
 function hsv_to_rgb (h: number, s: number, v: number): { r: number, g: number, b: number } {
-    let r: number, g: number, b: number
+    let r = 0
+    let g = 0
+    let b = 0
     // let i:number, f:number, p:number, q:number, t:number
     // if (arguments.length === 1) {
     //     s = h.s, v = h.v, h = h.h;

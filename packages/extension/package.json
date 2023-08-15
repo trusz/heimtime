@@ -16,7 +16,8 @@
     "build-storybook": "storybook build",
     "eslint": "eslint --ext .js,.ts src --fix",
     "eslint:fix": "npm run eslint -- --fix",
-    "test": "vitest"
+    "deploy": "npm run svelte-check && npm run build && npm run pages",
+    "pages": "gh-pages --dist dist --dotfiles"
   },
   "devDependencies": {
     "@storybook/addon-actions": "^7.2.2",
@@ -54,6 +55,7 @@
     "@event-calendar/interaction": "^1.5.1",
     "@event-calendar/time-grid": "^1.5.1",
     "concurrently": "^8.2.0",
+    "gh-pages": "^6.0.0",
     "lodash": "^4.17.21"
   }
 }

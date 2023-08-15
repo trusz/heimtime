@@ -5,7 +5,7 @@ function init (): void {
     // eslint-disable-next-line no-new
     new App({
         target: document.getElementById("view-root")!,
-        props:  {}
+        props:  {},
     })
 }
 

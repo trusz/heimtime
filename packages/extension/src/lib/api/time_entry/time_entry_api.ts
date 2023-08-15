@@ -146,6 +146,10 @@ interface Post_Tracked_Times {
 }
 
 function time_entry_to_post_tracked_times (time_entry: Time_Entry, employee_id: number): Post_Tracked_Times {
+    if (time_entry.task === undefined) {
+        throw new Error("time_entry_to_post_tracked_times: time entry must have a task")
+    }
+
     return {
         date:         date_format_iso(time_entry.start),
         employee:     { id: employee_id },
@@ -153,7 +157,7 @@ function time_entry_to_post_tracked_times (time_entry: Time_Entry, employee_id: 
             start: date_format_time(time_entry.start),
             end:   date_format_time(time_entry.end),
             note:  time_entry.description ?? "",
-            task:  { id: time_entry.task?.id },
+            task:  { id: time_entry.task.id },
         }],
     }
 }
@@ -169,6 +173,10 @@ interface Put_Tracked_Times {
 }
 
 function time_entry_to_put_tracked_times (time_entry: Time_Entry): Put_Tracked_Times {
+    if (time_entry.task === undefined) {
+        throw new Error("time_entry_to_put_tracked_times: time entry must have a task")
+    }
+
     return {
         date:         date_format_iso(time_entry.start),
         trackedTimes: [{
