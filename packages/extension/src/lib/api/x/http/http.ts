@@ -3,7 +3,7 @@ export type JSON_Response<T> = Omit<Response, "body"> & { body: T }
 
 export class HTTP {
     constructor (
-        public jwt: string
+        public jwt: string,
     ) {}
 
     public async get<T>(url: string): Promise<JSON_Response<T>> {
@@ -36,9 +36,9 @@ export class HTTP {
             headers: {
                 Authorization:  this.Auth_Header(),
                 Accept:         "application/json",
-                "content-type": "application/json;charset=UTF-8"
+                "content-type": "application/json;charset=UTF-8",
             },
-            body
+            body,
         })
 
         if (resp.status >= 400) {
@@ -59,7 +59,7 @@ export class HTTP {
 
         const typed_response = {
             ...resp,
-            body: json_body
+            body: json_body,
         }
 
         return typed_response

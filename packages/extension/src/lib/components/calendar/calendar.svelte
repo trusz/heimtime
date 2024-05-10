@@ -72,6 +72,8 @@
         nowIndicator: true,
         eventDidMount: handle_did_mount,
         eventContent: event_content,
+        noEventsClick: console.log,
+        noEventsContent: () => "nope",
         locale: "de",
         firstDay: 1,
         dayHeaderFormat: make_day_header_format(),
@@ -254,9 +256,25 @@
 
     // #endregion event handlers
 
+    function handle_paste(event: ClipboardEvent){
+        console.log({level:"dev", msg:"handling paste", e: event})
+        let pasted_text = event.clipboardData?.getData("text");
+        console.log({level:"dev", pasted_text})
+    }
+
+    function handle_drop(event: DragEvent){
+        console.log({level:"dev", msg:"handle_drop", event })
+        const items: unknown[] = []
+        for (const item of event.dataTransfer?.items ?? []) {
+            item.getAsString((s) => items.push(s))
+
+        }
+        console.log({level:"dev", msg:"handle_drop", items})
+    }
+
 </script>
 
-<div class="calendar-root">
+<div class="calendar-root" on:paste={handle_paste} on:drop={handle_drop} role="main">
     <Calendar {plugins} {options} bind:this={ec} />
     {#if cur_time_entry && anchor}
     {#key cur_time_entry && anchor}
